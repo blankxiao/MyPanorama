@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
 	alias(libs.plugins.android.library)
 	alias(libs.plugins.kotlin.android)
@@ -33,6 +35,13 @@ android {
 }
 
 dependencies {
+
+
+	implementation("com.facebook.fresco:fresco:2.6.0")
+	implementation("com.facebook.fresco:animated-gif:2.6.0")
+	implementation("com.facebook.fresco:animated-webp:2.6.0")
+	implementation("com.facebook.fresco:webpsupport:2.6.0")
+	implementation("com.facebook.fresco:imagepipeline-okhttp3:2.6.0")
 
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.appcompat)
