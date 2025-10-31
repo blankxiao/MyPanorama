@@ -19,7 +19,7 @@ class FileUtil {
 
 			val body = StringBuilder()
 			while (true) {
-				var nextLine = bufferedReader.readLine()
+				val nextLine = bufferedReader.readLine()
 				if (nextLine == null) break
 				body.append(nextLine)
 				body.append('\n')

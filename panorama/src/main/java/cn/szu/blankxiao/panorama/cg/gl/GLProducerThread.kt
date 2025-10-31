@@ -9,21 +9,24 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @description GLProducerThread
  * @date 2025-10-26 23:50
  */
-class GLProducerThread(val surfaceTexture: SurfaceTexture,
-					   val textureRenderer: GLTextureRenderer,
-					   var shouldRender: AtomicBoolean): Thread() {
+class GLProducerThread(
+	val surfaceTexture: SurfaceTexture,
+	val textureRenderer: GLTextureRenderer,
+	var shouldRender: AtomicBoolean
+) : Thread() {
 
 	// 渲染目标
 	var renderMode = 0
 
 	// EGL相关内容的封装 初始化 刷新 缓存交换 清理
-	var eglHelper: EglHelper = EglHelper()
+	var curEGLHelper: EglHelper = EglHelper()
 
 	// event
 	// 本地锁
-	var LOCK = Any()
+	var LOCK = Object()
+
 	// 消息队列
-	var mEventHandler: GLEventHandler = GLEventHandler()
+	var eventHandler: GLEventHandler = GLEventHandler()
 
 	var isPaused = false
 
@@ -34,7 +37,7 @@ class GLProducerThread(val surfaceTexture: SurfaceTexture,
 	 * @param runnable
 	 */
 	fun enqueueEvent(runnable: Runnable?) {
-		mEventHandler.enqueueEvent(runnable)
+		eventHandler.enqueueEvent(runnable)
 	}
 
 	/**
@@ -54,34 +57,34 @@ class GLProducerThread(val surfaceTexture: SurfaceTexture,
 
 	fun requestRender() {
 		synchronized(LOCK) {
-			(LOCK as Object).notifyAll()
+			LOCK.notifyAll()
 		}
 	}
 
 	fun releaseEglContext() {
-		eglHelper.releaseEGLContext()
+		curEGLHelper.releaseEGLContext()
 	}
 
 	fun refreshSurfaceTexture(surfaceTexture: SurfaceTexture) {
-		enqueueEvent({
-			eglHelper.refreshSurfaceTexture(surfaceTexture)
-		})
+		enqueueEvent {
+			curEGLHelper.refreshSurfaceTexture(surfaceTexture)
+		}
 	}
 
 	override fun run() {
-		eglHelper.initEGLContext(surfaceTexture)
+		curEGLHelper.initEGLContext(surfaceTexture)
 		textureRenderer.onGLContextAvailable()
 
 		while (shouldRender.get()) {
 			// 处理事件
 
-			mEventHandler.dequeueEventAndRun() // 先执行事件队列中没完成的任务
+			eventHandler.dequeueEventAndRun() // 先执行事件队列中没完成的任务
 
 			// 渲染
 			textureRenderer.onDrawFrame()
 
 			// TODO 缓存处理？
-			eglHelper.swapBuffers()
+			curEGLHelper.swapBuffers()
 
 			if (isPaused) {
 				pauseLoop()
@@ -94,7 +97,7 @@ class GLProducerThread(val surfaceTexture: SurfaceTexture,
 	private fun pauseLoop() {
 		synchronized(LOCK) {
 			try {
-				(LOCK as Object).wait()
+				LOCK.wait()
 			} catch (e: InterruptedException) {
 				e.printStackTrace()
 			}

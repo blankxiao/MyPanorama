@@ -8,8 +8,8 @@ package cn.szu.blankxiao.panorama.utils
 class ListBuilder<T> {
 	val list = ArrayList<T>()
 
-	fun add(vararg items: T){
-		for (item in items){
+	fun add(vararg items: T) {
+		for (item in items) {
 			list.add(item)
 		}
 	}

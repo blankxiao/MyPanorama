@@ -24,31 +24,6 @@ import androidx.core.net.toUri
 class ImageUtil {
 
 
-	fun load(target: SimpleDraweeView, uri: Uri?) {
-		val requestBuilder = ImageRequestBuilder.newBuilderWithSource(uri)
-		configRequestBuilder(requestBuilder)
-		load(target, requestBuilder.build())
-	}
-
-	fun load(target: SimpleDraweeView, string: String?) {
-		load(target, string?.toUri())
-	}
-
-	fun load(target: SimpleDraweeView, resId: Int) {
-		val requestBuilder: ImageRequestBuilder =
-			ImageRequestBuilder.newBuilderWithResourceId(resId)
-		configRequestBuilder(requestBuilder)
-		load(target, requestBuilder.build())
-	}
-
-	private fun load(target: SimpleDraweeView, request: ImageRequest?) {
-		val controllerBuilder = Fresco.newDraweeControllerBuilder()
-		controllerBuilder.oldController = target.controller
-		controllerBuilder.autoPlayAnimations = true
-		controllerBuilder.imageRequest = request
-		target.controller = controllerBuilder.build()
-	}
-
 	companion object {
 		fun loadBitmapFromCache(context: Context, url: String): Bitmap? {
 			val requestBuilder = ImageRequestBuilder.newBuilderWithSource(url.toUri())

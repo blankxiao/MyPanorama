@@ -18,39 +18,40 @@ class EglHelper {
 
 	// EGL context
 	// EGL接口对象 调用EGL提供的函数
-	private var mEgl: EGL10? = null
+	private var curEGL: EGL10? = null
 
 	// 显示设备的句柄 操作物理设备的媒介
-	private var mEGLDisplay: EGLDisplay? = EGL10.EGL_NO_DISPLAY
+	private var curEGLDisplay: EGLDisplay? = EGL10.EGL_NO_DISPLAY
 
 	// 渲染上下文
-	private var mEGLContext: EGLContext? = EGL10.EGL_NO_CONTEXT
+	private var curEGLContext: EGLContext? = EGL10.EGL_NO_CONTEXT
 
 	//	private EGLConfig[] mEGLConfig = new EGLConfig[1];
 	// TODO 帧缓冲区配置??
-	private var mEGLConfig: EGLConfig? = null
+	private var curEGLConfig: EGLConfig? = null
 
 	// 渲染表面 EGL层面
-	private var mEglSurface: EGLSurface? = null
+	private var curEGLSurface: EGLSurface? = null
 
 	// 渲染目标 安卓层面
-	private var mSurfaceTexture: SurfaceTexture? = null
+	private var targetSurfaceTexture: SurfaceTexture? = null
 
 	fun initEGLContext(surfaceTexture: SurfaceTexture?) {
 		// 获取TextureView内置的SurfaceTexture作为EGL的绘图表面，也就是跟系统屏幕打交道
 		if (surfaceTexture == null) {
 			return
 		}
-		mSurfaceTexture = surfaceTexture
+		targetSurfaceTexture = surfaceTexture
 
 		// 获取系统的EGL对象
-		mEgl = EGLContext.getEGL() as EGL10?
-		if (mEgl == null) {
+		curEGL = EGLContext.getEGL() as EGL10?
+		if (curEGL == null) {
+			return
 		}
 
 		// 获取显示设备
-		mEGLDisplay = mEgl!!.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
-		if (mEGLDisplay === EGL10.EGL_NO_DISPLAY) {
+		curEGLDisplay = curEGL!!.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
+		if (curEGLDisplay === EGL10.EGL_NO_DISPLAY) {
 			return
 		}
 
@@ -58,22 +59,24 @@ class EglHelper {
 		val version = IntArray(2)
 
 		// 初始化EGL
-		if (!mEgl!!.eglInitialize(mEGLDisplay, version)) {
+		if (!curEGL!!.eglInitialize(curEGLDisplay, version)) {
 			return
 		}
 
 		// GLSurfaceView 中的代码，configChooser 可能会适配各种机型的 EGLConfig
 		// Create a config chooser
-		val configChooser: AndroidConfigChooser =
-			AndroidConfigChooser(AndroidConfigChooser.ConfigType.FASTEST)
+		val configChooser = AndroidConfigChooser(AndroidConfigChooser.ConfigType.FASTEST)
 		configChooser.setClientOpenGLESVersion(2)
-		if (configChooser.findConfig(mEgl!!, mEGLDisplay)) {
-			mEGLConfig = configChooser.chooseConfig(mEgl, mEGLDisplay)
+		if (configChooser.findConfig(curEGL!!, curEGLDisplay)) {
+			curEGLConfig = configChooser.chooseConfig(curEGL, curEGLDisplay)
 		}
 
 		// 根据SurfaceTexture创建EGL绘图表面
-		mEglSurface = mEgl!!.eglCreateWindowSurface(mEGLDisplay, mEGLConfig, mSurfaceTexture, null)
-		if (mEglSurface === EGL10.EGL_NO_SURFACE) {
+		curEGLSurface = curEGL!!.eglCreateWindowSurface(
+			curEGLDisplay, curEGLConfig,
+			targetSurfaceTexture, null
+		)
+		if (curEGLSurface === EGL10.EGL_NO_SURFACE) {
 			return
 		}
 
@@ -84,24 +87,32 @@ class EglHelper {
 		)
 
 		// 创建上下文，EGL10.EGL_NO_CONTEXT表示不和别的上下文共享资源
-		mEGLContext =
-			mEgl!!.eglCreateContext(mEGLDisplay, mEGLConfig, EGL10.EGL_NO_CONTEXT, contextAttribs)
-		if (mEGLContext === EGL10.EGL_NO_CONTEXT) {
+		curEGLContext =
+			curEGL!!.eglCreateContext(
+				curEGLDisplay,
+				curEGLConfig,
+				EGL10.EGL_NO_CONTEXT,
+				contextAttribs
+			)
+		if (curEGLContext === EGL10.EGL_NO_CONTEXT) {
 			return
 		}
 
 		// 指定mEGLContext为当前系统的EGL上下文，你可能发现了使用两个mEglSurface，第一个表示绘图表面，第二个表示读取表面
-		if (!mEgl!!.eglMakeCurrent(mEGLDisplay, mEglSurface, mEglSurface, mEGLContext)) {
+		if (!curEGL!!.eglMakeCurrent(curEGLDisplay, curEGLSurface, curEGLSurface, curEGLContext)) {
 			return
 		}
 	}
 
 	fun refreshSurfaceTexture(surfaceTexture: SurfaceTexture) {
-		mSurfaceTexture = surfaceTexture
+		targetSurfaceTexture = surfaceTexture
 		// 根据SurfaceTexture创建EGL绘图表面
-		mEglSurface = mEgl!!.eglCreateWindowSurface(mEGLDisplay, mEGLConfig, mSurfaceTexture, null)
-		if (mEglSurface === EGL10.EGL_NO_SURFACE) {
-			throw RuntimeException("eglCreateWindowSurface failed! " + mEgl!!.eglGetError())
+		curEGLSurface = curEGL!!.eglCreateWindowSurface(
+			curEGLDisplay, curEGLConfig,
+			targetSurfaceTexture, null
+		)
+		if (curEGLSurface === EGL10.EGL_NO_SURFACE) {
+			throw RuntimeException("eglCreateWindowSurface failed! " + curEGL!!.eglGetError())
 		}
 
 		// 指定哪个版本的OpenGL ES上下文，本文为OpenGL ES 2.0
@@ -110,28 +121,33 @@ class EglHelper {
 			EGL10.EGL_NONE
 		)
 		// 创建上下文，EGL10.EGL_NO_CONTEXT表示不和别的上下文共享资源
-		mEGLContext =
-			mEgl!!.eglCreateContext(mEGLDisplay, mEGLConfig, EGL10.EGL_NO_CONTEXT, contextAttribs)
-		if (mEGLContext === EGL10.EGL_NO_CONTEXT) {
-			throw RuntimeException("eglCreateContext fail failed! " + mEgl!!.eglGetError())
+		curEGLContext =
+			curEGL!!.eglCreateContext(
+				curEGLDisplay,
+				curEGLConfig,
+				EGL10.EGL_NO_CONTEXT,
+				contextAttribs
+			)
+		if (curEGLContext === EGL10.EGL_NO_CONTEXT) {
+			throw RuntimeException("eglCreateContext fail failed! " + curEGL!!.eglGetError())
 		}
 
 		// 指定mEGLContext为当前系统的EGL上下文，你可能发现了使用两个mEglSurface，第一个表示绘图表面，第二个表示读取表面
-		if (!mEgl!!.eglMakeCurrent(mEGLDisplay, mEglSurface, mEglSurface, mEGLContext)) {
-			throw RuntimeException("eglMakeCurrent failed! " + mEgl!!.eglGetError())
+		if (!curEGL!!.eglMakeCurrent(curEGLDisplay, curEGLSurface, curEGLSurface, curEGLContext)) {
+			throw RuntimeException("eglMakeCurrent failed! " + curEGL!!.eglGetError())
 		}
 	}
 
 	fun swapBuffers() {
-		mEgl!!.eglSwapBuffers(mEGLDisplay, mEglSurface)
+		curEGL!!.eglSwapBuffers(curEGLDisplay, curEGLSurface)
 	}
 
 	fun releaseEGLContext() {
-		mEgl!!.eglDestroyContext(mEGLDisplay, mEGLContext)
-		mEgl!!.eglDestroySurface(mEGLDisplay, mEglSurface)
-		mEGLContext = EGL10.EGL_NO_CONTEXT
-		mEglSurface = EGL10.EGL_NO_SURFACE
-		mSurfaceTexture!!.release()
+		curEGL!!.eglDestroyContext(curEGLDisplay, curEGLContext)
+		curEGL!!.eglDestroySurface(curEGLDisplay, curEGLSurface)
+		curEGLContext = EGL10.EGL_NO_CONTEXT
+		curEGLSurface = EGL10.EGL_NO_SURFACE
+		targetSurfaceTexture!!.release()
 	}
 
 }

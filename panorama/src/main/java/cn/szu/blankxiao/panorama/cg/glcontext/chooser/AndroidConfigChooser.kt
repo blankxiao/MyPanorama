@@ -1,6 +1,5 @@
 package cn.szu.blankxiao.panorama.cg.glcontext.chooser
 
-import android.R.attr.type
 import android.graphics.PixelFormat
 import android.opengl.GLSurfaceView.EGLConfigChooser
 import javax.microedition.khronos.egl.EGL10
@@ -13,7 +12,7 @@ import javax.microedition.khronos.egl.EGLDisplay
  * @date 2025-10-26 23:48
  */
 
-class AndroidConfigChooser(type: ConfigType?) : EGLConfigChooser {
+class AndroidConfigChooser(val type: ConfigType?) : EGLConfigChooser {
 	private var clientOpenGLESVersion: Int = 0
 	private var bestConfig: EGLConfig? = null
 	private var fastestConfig: EGLConfig? = null
@@ -58,7 +57,7 @@ class AndroidConfigChooser(type: ConfigType?) : EGLConfigChooser {
 	 * @return true if successfull, false if no config was found
 	 */
 	fun findConfig(egl: EGL10, display: EGLDisplay?): Boolean {
-		if (type == ConfigType.BEST.ordinal) {
+		if (type == ConfigType.BEST) {
 			var compChooser = ComponentSizeChooser(8, 8, 8, 8, 16, 0)
 			choosenConfig = compChooser.chooseConfig(egl, display!!)
 			if (choosenConfig == null) {

@@ -12,7 +12,7 @@ import kotlin.math.sin
  * @description Sphere
  * @date 2025-10-26 21:16
  */
-class Sphere: AbstractMesh() {
+class Sphere : AbstractMesh() {
 	val positons = ListBuilder<Float>()
 	val textureCoordinates = ListBuilder<Float>()
 	val colors = ListBuilder<Float>()
@@ -23,44 +23,48 @@ class Sphere: AbstractMesh() {
 	lateinit var textureFloats: FloatArray
 	lateinit var indicesShorts: ShortArray
 
-	fun generate(radius: Float, widthSegments: Int, heightSegments: Int,
-				 phiStart: Double, phiLength: Double, thetaStart: Double, thetaLength: Double){
+	fun generate(
+		radius: Float, widthSegments: Int, heightSegments: Int,
+		phiStart: Double, phiLength: Double, thetaStart: Double, thetaLength: Double
+	) {
 		val thetaEnd = thetaStart + thetaLength
 
 		var index = 0
 		val vertices = ArrayList<ArrayList<Int>>()
 
-		for (y in 0 .. heightSegments){
+		for (y in 0..heightSegments) {
 			val verticesRow = ArrayList<Int>()
 			val v = y / heightSegments.toFloat()
 
-			for (x in 0 .. widthSegments){
+			for (x in 0..widthSegments) {
 				val u = x / widthSegments.toFloat()
-				val px = (- radius * cos(phiStart + u * phiLength) * sin(thetaStart + v * thetaLength)).toFloat()
-				val py = (radius * cos(thetaStart + u * thetaLength)).toFloat()
-				val pz = (radius * sin(phiStart + u * phiLength) * sin(thetaStart + v * thetaLength)).toFloat()
+				val px =
+					(-radius * cos(phiStart + u * phiLength) * sin(thetaStart + v * thetaLength)).toFloat()
+				val py = (radius * cos(thetaStart + v * thetaLength)).toFloat()
+				val pz =
+					(radius * sin(phiStart + u * phiLength) * sin(thetaStart + v * thetaLength)).toFloat()
 
 				positons.add(-px, py, pz)
 				textureCoordinates.add(u, v)
 				colors.add(u, v, u, 1f)
 
 				verticesRow.add(index)
-				index ++
+				index++
 			}
 			vertices.add(verticesRow)
 		}
 
-		for (y in 0 until heightSegments){
-			for (x in 0 until widthSegments){
+		for (y in 0 until heightSegments) {
+			for (x in 0 until widthSegments) {
 				val v1 = vertices[y][x + 1]
 				val v2 = vertices[y][x]
 				val v3 = vertices[y + 1][x]
 				val v4 = vertices[y + 1][x + 1]
 
-				if (y != 0 || thetaStart > 0){
+				if (y != 0 || thetaStart > 0) {
 					indices.add(v1.toShort(), v4.toShort(), v2.toShort())
 				}
-				if (y != heightSegments - 1 || thetaEnd < PI){
+				if (y != heightSegments - 1 || thetaEnd < PI) {
 					indices.add(v2.toShort(), v4.toShort(), v3.toShort())
 				}
 			}
@@ -80,12 +84,14 @@ class Sphere: AbstractMesh() {
 	}
 
 	companion object {
-		fun getDefaultSphere(): Sphere{
+		fun getDefaultSphere(): Sphere {
 			val sphere = Sphere()
-			sphere.generate(5f,
+			sphere.generate(
+				5f,
 				48, 48,
 				0.0, Math.PI * 2,
-				0.0, Math.PI)
+				0.0, Math.PI
+			)
 			return sphere
 		}
 	}

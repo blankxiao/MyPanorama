@@ -14,7 +14,7 @@ class Texture {
 	var textureUnit: Int = 0
 
 
-	fun create(){
+	fun create() {
 		val array = IntArray(1)
 		GLES20.glGenTextures(1, array, 0)
 		textureName = array[0]
@@ -52,12 +52,12 @@ class Texture {
 		}
 	}
 
-	fun bindSampler(textureHandler: Int){
-		GLES20.glUniform1f(textureHandler, textureName.toFloat())
+	fun bindSampler(textureHandler: Int) {
+		GLES20.glUniform1i(textureHandler, textureName)
 	}
 
-	fun destroy(){
-		GLES20.glDeleteTextures(1, IntArray(1) {textureName}, 0);
+	fun destroy() {
+		GLES20.glDeleteTextures(1, IntArray(1) { textureName }, 0);
 	}
 
 	fun isAvailable() = textureName != 0

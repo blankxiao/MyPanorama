@@ -9,17 +9,17 @@ import java.util.LinkedList
  */
 class GLEventHandler {
 	// 事件队列 存储执行的任务
-	private val mGLQueue = LinkedList<Runnable?>()
+	private val curGLQueue = LinkedList<Runnable?>()
 
 	fun dequeueEventAndRun() {
-		while (!mGLQueue.isEmpty()) {
-			mGLQueue.removeFirst()!!.run()
+		while (!curGLQueue.isEmpty()) {
+			curGLQueue.removeFirst()!!.run()
 		}
 	}
 
 	fun enqueueEvent(runnable: Runnable?) {
-		synchronized(mGLQueue) {
-			mGLQueue.addLast(runnable)
+		synchronized(curGLQueue) {
+			curGLQueue.addLast(runnable)
 		}
 	}
 }

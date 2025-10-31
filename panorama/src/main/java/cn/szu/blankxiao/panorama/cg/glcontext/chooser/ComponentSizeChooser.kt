@@ -10,7 +10,7 @@ import javax.microedition.khronos.egl.EGLDisplay
  * @date 2025-10-26 23:40
  */
 
-class ComponentSizeChooser(
+open class ComponentSizeChooser(
 	redSize: Int, greenSize: Int, blueSize: Int,
 	alphaSize: Int, depthSize: Int, stencilSize: Int
 ) : BaseConfigChooser(
@@ -24,25 +24,15 @@ class ComponentSizeChooser(
 		EGL10.EGL_NONE
 	)
 ) {
-	private val mValue: IntArray
+	private val mValue: IntArray = IntArray(1)
 
 	// Subclasses can adjust these values:
-	protected var mRedSize: Int
-	protected var mGreenSize: Int
-	protected var mBlueSize: Int
-	protected var mAlphaSize: Int
-	protected var mDepthSize: Int
-	protected var mStencilSize: Int
-
-	init {
-		mValue = IntArray(1)
-		mRedSize = redSize
-		mGreenSize = greenSize
-		mBlueSize = blueSize
-		mAlphaSize = alphaSize
-		mDepthSize = depthSize
-		mStencilSize = stencilSize
-	}
+	protected var mRedSize: Int = redSize
+	protected var mGreenSize: Int = greenSize
+	protected var mBlueSize: Int = blueSize
+	protected var mAlphaSize: Int = alphaSize
+	protected var mDepthSize: Int = depthSize
+	protected var mStencilSize: Int = stencilSize
 
 
 	override fun chooseConfig(

@@ -19,14 +19,12 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @description PanoramaView
  * @date 2025-10-26 17:13
  */
-class PanoramaView(context: Context, attrs: AttributeSet?) :
-	FrameLayout(context, attrs),
+class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
 	TextureView.SurfaceTextureListener {
 
 	// TextureView 作为openGL渲染内容的显示载体
 	// 内部使用了SurfaceTexture 是opengl的直接渲染目标
-	private var mRenderView: TextureView? = null
-
+	var renderView: TextureView
 
 	// 渲染器
 	var renderer: SphereRenderer
@@ -41,18 +39,16 @@ class PanoramaView(context: Context, attrs: AttributeSet?) :
 
 
 	init {
-		val activityManager =
-			context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-		val configurationInfo =
-			activityManager.deviceConfigurationInfo
+		val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+		val configurationInfo = activityManager.deviceConfigurationInfo
 		val supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000
 		if (supportsEs2) {
-			placeHolder = BitmapFactory.decodeResource(getResources(), R.color.black)
+			placeHolder = BitmapFactory.decodeResource(resources, R.color.black)
 
-			mRenderView = TextureView(context)
+			renderView = TextureView(context)
 			renderer = SphereRenderer(context)
-			mRenderView!!.setSurfaceTextureListener(this)
-			addView(mRenderView)
+			renderView.surfaceTextureListener = this
+			addView(renderView)
 		} else {
 			throw RuntimeException("your device does not support opengles 2.0")
 		}
@@ -115,8 +111,7 @@ class PanoramaView(context: Context, attrs: AttributeSet?) :
 			producerThread = GLProducerThread(surface, renderer, AtomicBoolean(true))
 			producerThread.start()
 
-			producerThread.enqueueEvent({ renderer.onSurfaceChanged(width, height) }
-			)
+			producerThread.enqueueEvent { renderer.onSurfaceChanged(width, height) }
 
 			loadBitmapFromCurrentUrl()
 		} else {
@@ -128,13 +123,12 @@ class PanoramaView(context: Context, attrs: AttributeSet?) :
 	}
 
 	override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-		producerThread.enqueueEvent({ renderer.onSurfaceChanged(width, height) }
-		)
+		producerThread.enqueueEvent { renderer.onSurfaceChanged(width, height) }
 	}
 
 	override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
 		if (isGLThreadAvailable) {
-				producerThread.onPause()
+			producerThread.onPause()
 		}
 		return true
 	}
@@ -171,18 +165,18 @@ class PanoramaView(context: Context, attrs: AttributeSet?) :
 			changeBitmapToGLTexture(bitmap)
 		} else {
 			loadBitmapToGLTexture(placeHolder)
-			ImageUtil.loadBitmapFromNetwork(context, currentBitmapUrl, { tempBitmap ->
+			ImageUtil.loadBitmapFromNetwork(context, currentBitmapUrl) { tempBitmap ->
 				if (tempBitmap != null) {
 					changeBitmapToGLTexture(tempBitmap)
 				}
-			})
+			}
 		}
 	}
 
 	private fun changeBitmapToGLTexture(bitmap: Bitmap) {
-		producerThread.enqueueEvent({
+		producerThread.enqueueEvent {
 			renderer.changeTextureBitmap(bitmap)
-		})
+		}
 	}
 
 
