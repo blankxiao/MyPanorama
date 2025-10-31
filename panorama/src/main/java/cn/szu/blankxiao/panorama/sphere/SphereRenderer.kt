@@ -1,6 +1,5 @@
 package cn.szu.blankxiao.panorama.sphere
 
-import android.R.attr.bitmap
 import android.content.Context
 import android.graphics.Bitmap
 import android.hardware.Sensor
@@ -13,6 +12,9 @@ import cn.szu.blankxiao.panorama.R
 import cn.szu.blankxiao.panorama.cg.camera.Axis
 import cn.szu.blankxiao.panorama.cg.camera.Camera
 import cn.szu.blankxiao.panorama.cg.mesh.AbstractMesh
+import cn.szu.blankxiao.panorama.cg.mesh.AbstractMesh.Companion.COORDINATES_PER_COLOR
+import cn.szu.blankxiao.panorama.cg.mesh.AbstractMesh.Companion.COORDINATES_PER_TEXTURE_COORDINATES
+import cn.szu.blankxiao.panorama.cg.mesh.AbstractMesh.Companion.COORDINATES_PER_VERTEX
 import cn.szu.blankxiao.panorama.cg.render.GLTextureRenderer
 import cn.szu.blankxiao.panorama.cg.render.Shader
 import cn.szu.blankxiao.panorama.cg.render.Texture
@@ -23,9 +25,9 @@ import cn.szu.blankxiao.panorama.utils.OpenGLUtil
  * @description GLRendererListener
  * @date 2025-10-26 22:18
  */
-class SphereRenderer(val context: Context):
+class SphereRenderer(val context: Context) :
 	GLTextureRenderer,
-	SensorEventListener{
+	SensorEventListener {
 
 
 	// 渲染目标
@@ -44,10 +46,11 @@ class SphereRenderer(val context: Context):
 	 * 着色器
 	 */
 	// 顶点着色器
-	var vertexShader: Shader
-	var fragmentShader: Shader
+	var vertexShader = Shader()
+	var fragmentShader: Shader = Shader()
+
 	// 球体
-	var sphere: Sphere
+	var sphere: Sphere = Sphere.getDefaultSphere()
 
 	/**
 	 * 偏移矩阵
@@ -66,8 +69,11 @@ class SphereRenderer(val context: Context):
 	/**
 	 * 陀螺仪
 	 */
-	var sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-	var sensor: Sensor
+	var sensorManager: SensorManager =
+		context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+	// TODO 可空?
+	var sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!!
 
 
 	var isFirstFrame = true
@@ -77,16 +83,6 @@ class SphereRenderer(val context: Context):
 	var rotVecValues: FloatArray? = null
 
 	private val rotationQuaternion = FloatArray(4)
-
-
-	init {
-		// TODO 可空?
-		sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!!
-
-		sphere = Sphere.getDefaultSphere()
-		vertexShader = Shader()
-		fragmentShader = Shader()
-	}
 
 	override fun onGLContextAvailable() {
 		texture = Texture()
@@ -130,11 +126,10 @@ class SphereRenderer(val context: Context):
 	}
 
 
-	override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-	}
+	override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
 	override fun onSensorChanged(event: SensorEvent?) {
-		if (event!!.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+		if (event!!.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
 			if (isFirstFrame) { // 初始化时，先给一个初始角度，以便能绘制出第一帧的图
 				isFirstFrame = false
 				val orientationMatrix = FloatArray(16)
@@ -143,15 +138,14 @@ class SphereRenderer(val context: Context):
 				if (rotVecValues == null) {
 					rotVecValues = FloatArray(event.values.size)
 				}
-				for (i in rotVecValues?.indices!!) {
-					rotVecValues?.set(i, event.values[i])
+				for (i in rotVecValues!!.indices) {
+					rotVecValues!![i] = event.values[i]
 				}
 
-				if (rotVecValues != null) {
-					SensorManager.getQuaternionFromVector(rotationQuaternion, rotVecValues)
-					SensorManager.getRotationMatrixFromVector(orientationMatrix, rotVecValues)
-					rotationMatrix = orientationMatrix
-				}
+				SensorManager.getQuaternionFromVector(rotationQuaternion, rotVecValues)
+				SensorManager.getRotationMatrixFromVector(orientationMatrix, rotVecValues)
+				rotationMatrix = orientationMatrix
+
 				val invertMatrix = FloatArray(16)
 				Matrix.invertM(invertMatrix, 0, orientationMatrix, 0)
 				biasMatrix = invertMatrix
@@ -200,19 +194,20 @@ class SphereRenderer(val context: Context):
 		vertexShader.bindVertexBuffer(
 			programHandle,
 			"a_Position",
-			AbstractMesh.Companion.COORDINATES_PER_VERTEX,
+			COORDINATES_PER_VERTEX,
 			sphere.vertexBuffer
 		)
 		vertexShader.bindColorBuffer(
 			programHandle,
 			"a_Color",
-			AbstractMesh.Companion.COORDINATES_PER_COLOR,
-			sphere.vertexBuffer
+			COORDINATES_PER_COLOR,
+			sphere.colorBuffer
 		)
+
 		vertexShader.bindTextureCoordinatesBuffer(
 			programHandle,
 			"a_TextureCoordinates",
-			AbstractMesh.Companion.COORDINATES_PER_TEXTURE_COORDINATES,
+			COORDINATES_PER_TEXTURE_COORDINATES,
 			sphere.textureCoordinateBuffer
 		)
 

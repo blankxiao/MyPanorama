@@ -22,7 +22,7 @@ class Camera(val fov: FOV, val screenRatio: Float) {
 	private var viewMatrix = FloatArray(16)
 
 	constructor(screenRatio: Float) : this(FOV, screenRatio) {
-		var top: Float = (tan(fov.viewAngle) * Math.PI / 360.0f).toFloat() * fov.zNear
+		var top: Float = (tan((fov.viewAngle * Math.PI / 360.0f).toDouble()) * fov.zNear).toFloat()
 		var bottom = -top
 		var left = screenRatio * bottom
 		var right = screenRatio * top
