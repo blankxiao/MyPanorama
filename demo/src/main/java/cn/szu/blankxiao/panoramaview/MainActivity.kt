@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 		panoramaTextureView.setBitmapUrl(IMAGE_URL)
 		panoramaTextureView.setGyroTrackingEnabled(true)
 
-		btnGyroController.tag = true
+		btnGyroController.tag = false
 		btnGyroController.text = "关闭陀螺仪"
 	}
 
