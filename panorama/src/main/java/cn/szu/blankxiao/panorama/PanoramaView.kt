@@ -34,7 +34,8 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 
 	// 是否已经初始化GL线程
 	private var isGLThreadAvailable = false
-	lateinit var currentBitmapUrl: String
+	private var currentBitmapUrl: String? = null
+	private var localBitmap: Bitmap? = null  // 直接设置的本地 Bitmap
 	var placeHolder: Bitmap
 
 
@@ -77,6 +78,19 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 	 */
 	fun setBitmapUrl(url: String) {
 		currentBitmapUrl = url
+	}
+
+	/**
+	 * 直接设置 Bitmap（用于本地图片）
+	 *
+	 * @param bitmap
+	 */
+	fun setBitmap(bitmap: Bitmap) {
+		localBitmap = bitmap
+		currentBitmapUrl = null  // 清除 URL，使用本地 Bitmap
+		if (isGLThreadAvailable) {
+			loadBitmapToGLTexture(bitmap)
+		}
 	}
 
 	/**
@@ -137,15 +151,29 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 	}
 
 	private fun loadBitmapFromCurrentUrl() {
+		// 优先使用直接设置的本地 Bitmap
+		val local = localBitmap
+		if (local != null) {
+			loadBitmapToGLTexture(local)
+			return
+		}
+
+		// 使用 URL 加载
+		val url = currentBitmapUrl
+		if (url == null) {
+			loadBitmapToGLTexture(placeHolder)
+			return
+		}
+
 		// 尝试从缓存读取图片资源
-		val bitmap: Bitmap? = ImageUtil.loadBitmapFromCache(context, currentBitmapUrl)
+		val bitmap: Bitmap? = ImageUtil.loadBitmapFromCache(context, url)
 		if (bitmap != null) {
 			loadBitmapToGLTexture(bitmap)
 		} else {
 			// 不存在
 			// 先显示默认图 再网络加载
 			loadBitmapToGLTexture(placeHolder)
-			ImageUtil.loadBitmapFromNetwork(context, currentBitmapUrl) { tempBitmap ->
+			ImageUtil.loadBitmapFromNetwork(context, url) { tempBitmap ->
 				if (tempBitmap != null) {
 					loadBitmapToGLTexture(tempBitmap)
 				}
@@ -160,12 +188,26 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 	}
 
 	private fun changeBitmapFromCurrentUrl() {
-		val bitmap: Bitmap? = ImageUtil.loadBitmapFromCache(context, currentBitmapUrl)
+		// 优先使用直接设置的本地 Bitmap
+		val local = localBitmap
+		if (local != null) {
+			changeBitmapToGLTexture(local)
+			return
+		}
+
+		// 使用 URL 加载
+		val url = currentBitmapUrl
+		if (url == null) {
+			loadBitmapToGLTexture(placeHolder)
+			return
+		}
+
+		val bitmap: Bitmap? = ImageUtil.loadBitmapFromCache(context, url)
 		if (bitmap != null) {
 			changeBitmapToGLTexture(bitmap)
 		} else {
 			loadBitmapToGLTexture(placeHolder)
-			ImageUtil.loadBitmapFromNetwork(context, currentBitmapUrl) { tempBitmap ->
+			ImageUtil.loadBitmapFromNetwork(context, url) { tempBitmap ->
 				if (tempBitmap != null) {
 					changeBitmapToGLTexture(tempBitmap)
 				}

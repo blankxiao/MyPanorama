@@ -1,6 +1,7 @@
 package cn.szu.blankxiao.panoramaview
 
 import android.annotation.SuppressLint
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -11,8 +12,9 @@ import cn.szu.blankxiao.panorama.PanoramaView
 class MainActivity : AppCompatActivity() {
 
 
-	val IMAGE_URL: String =
-		"https://raw.githubusercontent.com/ShinooGoyal/PanoramaView/refs/heads/main/app/src/main/res/drawable/panorama.jpg"
+	// 原网络 URL（备用）
+	// val IMAGE_URL: String =
+	// 	"https://raw.githubusercontent.com/ShinooGoyal/PanoramaView/refs/heads/main/app/src/main/res/drawable/panorama.jpg"
 
 	lateinit var panoramaTextureView: PanoramaView
 	lateinit var btnGyroController: Button
@@ -25,7 +27,9 @@ class MainActivity : AppCompatActivity() {
 		panoramaTextureView = findViewById(R.id.panorama)
 		btnGyroController = findViewById(R.id.btn_gyro_controller)
 
-		panoramaTextureView.setBitmapUrl(IMAGE_URL)
+		// 使用本地全景图（MVDiffusion 生成的）
+		val bitmap = BitmapFactory.decodeResource(resources, R.drawable.pano)
+		panoramaTextureView.setBitmap(bitmap)
 		panoramaTextureView.setGyroTrackingEnabled(true)
 
 		btnGyroController.tag = false
