@@ -11,10 +11,11 @@ import android.opengl.Matrix
 import cn.szu.blankxiao.panorama.R
 import cn.szu.blankxiao.panorama.cg.camera.Axis
 import cn.szu.blankxiao.panorama.cg.camera.Camera
-import cn.szu.blankxiao.panorama.cg.mesh.AbstractMesh
-import cn.szu.blankxiao.panorama.cg.mesh.AbstractMesh.Companion.COORDINATES_PER_COLOR
-import cn.szu.blankxiao.panorama.cg.mesh.AbstractMesh.Companion.COORDINATES_PER_TEXTURE_COORDINATES
-import cn.szu.blankxiao.panorama.cg.mesh.AbstractMesh.Companion.COORDINATES_PER_VERTEX
+import cn.szu.blankxiao.panorama.cg.mesh.MeshType
+import cn.szu.blankxiao.panorama.cg.mesh.PanoramaMesh
+import cn.szu.blankxiao.panorama.cg.mesh.PanoramaMesh.Companion.COORDINATES_PER_COLOR
+import cn.szu.blankxiao.panorama.cg.mesh.PanoramaMesh.Companion.COORDINATES_PER_TEXTURE_COORDINATES
+import cn.szu.blankxiao.panorama.cg.mesh.PanoramaMesh.Companion.COORDINATES_PER_VERTEX
 import cn.szu.blankxiao.panorama.cg.render.GLTextureRenderer
 import cn.szu.blankxiao.panorama.cg.render.Shader
 import cn.szu.blankxiao.panorama.cg.render.Texture
@@ -49,8 +50,9 @@ class SphereRenderer(val context: Context) :
 	var vertexShader = Shader()
 	var fragmentShader: Shader = Shader()
 
-	// 球体
-	var sphere: Sphere = Sphere.getDefaultSphere()
+	// 当前使用的几何体模型
+	private var mesh: PanoramaMesh = Sphere.getDefault()
+	private var currentMeshType: MeshType = MeshType.SPHERE
 
 	/**
 	 * 偏移矩阵
@@ -60,7 +62,7 @@ class SphereRenderer(val context: Context) :
 		1f, 0f, 0f, 0f,
 		0f, 1f, 0f, 0f,
 		0f, 0f, 1f, 0f,
-		0f, 0f, 0f, 0f
+		0f, 0f, 0f, 1f
 	)
 
 	// 偏移矩阵
@@ -177,15 +179,82 @@ class SphereRenderer(val context: Context) :
 		isGyroTrackingEnabled = enabled
 	}
 
+	/**
+	 * 设置全景图模型类型
+	 * @param meshType 模型类型（SPHERE 或 CYLINDER）
+	 */
+	fun setMeshType(meshType: MeshType) {
+		if (currentMeshType != meshType) {
+			currentMeshType = meshType
+			mesh = when (meshType) {
+				MeshType.SPHERE -> Sphere.getDefault()
+				MeshType.CYLINDER -> Cylinder.getDefault()
+			}
+		}
+	}
+
+	/**
+	 * 获取当前模型类型
+	 */
+	fun getMeshType(): MeshType = currentMeshType
+
 
 	/**
 	 * 初始化相机
 	 */
 	private fun controlCamera() {
 		camera.rebuildViewMatrix()
-		camera.rotate(rotationMatrix)
-		camera.rotate(biasMatrix)
+		
+		when (currentMeshType) {
+			MeshType.SPHERE -> {
+				// 球体模式：完整的 3D 旋转
+				camera.rotate(rotationMatrix)
+				camera.rotate(biasMatrix)
+			}
+			MeshType.CYLINDER -> {
+				// 圆柱体模式：只允许水平旋转（限制俯仰角）
+				// 关键：先组合两个矩阵，再从组合结果中提取 yaw
+				val combinedMatrix = FloatArray(16)
+				Matrix.multiplyMM(combinedMatrix, 0, rotationMatrix, 0, biasMatrix, 0)
+				
+				// 从组合矩阵中提取 yaw 并应用
+				val yawOnlyMatrix = extractYawRotation(combinedMatrix)
+				camera.rotate(yawOnlyMatrix)
+			}
+		}
+		
 		camera.rotate(-90.0f, Axis.AXIS_Y)
+	}
+
+	/**
+	 * 从旋转矩阵中提取仅包含 yaw（绕 Y 轴旋转）的矩阵
+	 * 用于圆柱体模式，限制只能水平旋转
+	 * 
+	 * Android 传感器坐标系：
+	 * - 世界坐标系：X 指东，Y 指北，Z 指天
+	 * - 设备坐标系：X 向右，Y 向上，Z 向用户
+	 * 
+	 * 旋转矩阵将设备坐标转换为世界坐标
+	 * 我们需要提取绕世界 Z 轴（垂直轴）的旋转作为 yaw
+	 * 
+	 * Android Matrix 是列主序 (column-major)：
+	 * [0]  [4]  [8]   [12]
+	 * [1]  [5]  [9]   [13]
+	 * [2]  [6]  [10]  [14]
+	 * [3]  [7]  [11]  [15]
+	 */
+	private fun extractYawRotation(inputMatrix: FloatArray): FloatArray {
+		// 从组合旋转矩阵中提取绕 Z 轴的旋转角度（传感器世界坐标系中 Z 是垂直轴）
+		// ZYX 欧拉角分解：yaw = atan2(R[1][0], R[0][0])
+		// 列主序下：R[1][0] = index 1, R[0][0] = index 0
+		val yaw = Math.atan2(inputMatrix[1].toDouble(), inputMatrix[0].toDouble())
+		
+		// 映射到 OpenGL 坐标系：绕 Y 轴旋转（OpenGL 中 Y 是垂直轴）
+		val result = FloatArray(16)
+		Matrix.setIdentityM(result, 0)
+		Matrix.rotateM(result, 0, Math.toDegrees(yaw).toFloat(), 0f, 1f, 0f)
+		
+		return result
 	}
 
 	private fun renderSphere() {
@@ -195,20 +264,20 @@ class SphereRenderer(val context: Context) :
 			programHandle,
 			"a_Position",
 			COORDINATES_PER_VERTEX,
-			sphere.vertexBuffer
+			mesh.vertexBuffer
 		)
 		vertexShader.bindColorBuffer(
 			programHandle,
 			"a_Color",
 			COORDINATES_PER_COLOR,
-			sphere.colorBuffer
+			mesh.colorBuffer
 		)
 
 		vertexShader.bindTextureCoordinatesBuffer(
 			programHandle,
 			"a_TextureCoordinates",
 			COORDINATES_PER_TEXTURE_COORDINATES,
-			sphere.textureCoordinateBuffer
+			mesh.textureCoordinateBuffer
 		)
 
 		fragmentShader.bindTextureSampler2D(programHandle, "u_Texture", texture.textureName)
@@ -219,9 +288,9 @@ class SphereRenderer(val context: Context) :
 
 		GLES20.glDrawElements(
 			GLES20.GL_TRIANGLES,
-			sphere.indicesShorts.size,
+			mesh.indicesCount,
 			GLES20.GL_UNSIGNED_SHORT,
-			sphere.indicesBuffer
+			mesh.indicesBuffer
 		)
 
 		vertexShader.disableAllAttrbHandle()

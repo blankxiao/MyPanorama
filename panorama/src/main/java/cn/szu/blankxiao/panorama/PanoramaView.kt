@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.TextureView
 import android.widget.FrameLayout
 import cn.szu.blankxiao.panorama.cg.gl.GLProducerThread
+import cn.szu.blankxiao.panorama.cg.mesh.MeshType
 import cn.szu.blankxiao.panorama.sphere.SphereRenderer
 import cn.szu.blankxiao.panorama.utils.ImageUtil
 import java.util.concurrent.atomic.AtomicBoolean
@@ -92,6 +93,22 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 			loadBitmapToGLTexture(bitmap)
 		}
 	}
+
+	/**
+	 * 设置全景图模型类型
+	 * 
+	 * @param meshType 模型类型
+	 *   - MeshType.SPHERE: 球体模型，适用于 equirectangular 全景图（默认）
+	 *   - MeshType.CYLINDER: 圆柱体模型，适用于圆柱形全景图
+	 */
+	fun setMeshType(meshType: MeshType) {
+		renderer.setMeshType(meshType)
+	}
+
+	/**
+	 * 获取当前模型类型
+	 */
+	fun getMeshType(): MeshType = renderer.getMeshType()
 
 	/**
 	 * 添加到窗口时调用
