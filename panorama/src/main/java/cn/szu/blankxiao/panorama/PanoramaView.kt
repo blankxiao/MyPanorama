@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.TextureView
 import android.widget.FrameLayout
 import cn.szu.blankxiao.panorama.cg.gl.GLProducerThread
@@ -17,13 +18,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * @author BlankXiao
- * @description PanoramaView
+ * @description PanoramaView 集成陀螺仪功能的FrameLayout
  * @date 2025-10-26 17:13
  */
 class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
 	TextureView.SurfaceTextureListener {
 
-	// TextureView 作为openGL渲染内容的显示载体
+	// TextureView 作为openGL渲染内容的显示载体 的当前Frame布局的唯一子view
 	// 内部使用了SurfaceTexture 是opengl的直接渲染目标
 	var renderView: TextureView
 
@@ -39,6 +40,11 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 	private var localBitmap: Bitmap? = null  // 直接设置的本地 Bitmap
 	var placeHolder: Bitmap
 
+	// 触摸相关
+	private var lastTouchX: Float = 0f
+	private var lastTouchY: Float = 0f
+	private var isTouching: Boolean = false
+
 
 	init {
 		val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -50,6 +56,8 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 			renderView = TextureView(context)
 			renderer = SphereRenderer(context)
 			renderView.surfaceTextureListener = this
+			// 设置 renderView 不拦截触摸事件，让父视图处理
+			renderView.setOnTouchListener { _, _ -> false }
 			addView(renderView)
 		} else {
 			throw RuntimeException("your device does not support opengles 2.0")
@@ -109,6 +117,19 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 	 * 获取当前模型类型
 	 */
 	fun getMeshType(): MeshType = renderer.getMeshType()
+
+	/**
+	 * 设置触摸灵敏度
+	 * @param sensitivity 灵敏度值，默认 0.5f，值越大越敏感
+	 */
+	fun setTouchSensitivity(sensitivity: Float) {
+		renderer.touchSensitivity = sensitivity
+	}
+
+	/**
+	 * 获取触摸灵敏度
+	 */
+	fun getTouchSensitivity(): Float = renderer.touchSensitivity
 
 	/**
 	 * 添加到窗口时调用
@@ -238,5 +259,60 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 		}
 	}
 
+	/**
+	 * 处理触摸事件
+	 */
+	override fun onTouchEvent(event: MotionEvent): Boolean {
+		if (!isGLThreadAvailable) {
+			return super.onTouchEvent(event)
+		}
+
+		when (event.action) {
+			MotionEvent.ACTION_DOWN -> {
+				// 开始触摸
+				lastTouchX = event.x
+				lastTouchY = event.y
+				isTouching = true
+				producerThread.enqueueEvent {
+					renderer.startTouchRotation()
+				}
+				return true
+			}
+			MotionEvent.ACTION_MOVE -> {
+				if (isTouching) {
+					// 计算移动距离
+					val deltaX = event.x - lastTouchX
+					val deltaY = event.y - lastTouchY
+					lastTouchX = event.x
+					lastTouchY = event.y
+					
+					// 应用触摸旋转
+					producerThread.enqueueEvent {
+						renderer.applyTouchRotation(deltaX, deltaY)
+					}
+					return true
+				}
+			}
+			MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+				if (isTouching) {
+					isTouching = false
+					producerThread.enqueueEvent {
+						renderer.endTouchRotation()
+					}
+					return true
+				}
+			}
+		}
+		
+		return super.onTouchEvent(event)
+	}
+
+	/**
+	 * 拦截触摸事件，确保触摸事件被正确处理
+	 */
+	override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+		// 允许触摸事件传递给 onTouchEvent
+		return false
+	}
 
 }

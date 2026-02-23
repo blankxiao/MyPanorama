@@ -12,8 +12,10 @@ class GLEventHandler {
 	private val curGLQueue = LinkedList<Runnable?>()
 
 	fun dequeueEventAndRun() {
-		while (!curGLQueue.isEmpty()) {
-			curGLQueue.removeFirst()!!.run()
+		synchronized(curGLQueue) {
+			while (!curGLQueue.isEmpty()) {
+				curGLQueue.removeFirst()!!.run()
+			}
 		}
 	}
 

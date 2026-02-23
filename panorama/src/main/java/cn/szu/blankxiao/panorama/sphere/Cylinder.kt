@@ -73,7 +73,11 @@ class Cylinder : PanoramaMesh {
                 val pz = (radius * sin(phi)).toFloat()
 
                 positions.add(px, py, pz)
-                textureCoordinates.add(u, v)
+                // 纹理坐标：垂直方向翻转（1-v）以匹配球体的纹理映射方向
+                // 球体：v=0 对应顶部，v=1 对应底部
+                // 圆柱体：v=0 对应底部，v=1 对应顶部
+                // 翻转后：1-v=1 对应顶部，1-v=0 对应底部，与球体一致
+                textureCoordinates.add(u, 1f - v)
                 colors.add(u, v, u, 1f)
 
                 verticesRow.add(index)

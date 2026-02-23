@@ -5,9 +5,12 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import cn.szu.blankxiao.panorama.PanoramaView
 import cn.szu.blankxiao.panorama.cg.mesh.MeshType
+import java.util.Locale
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +23,8 @@ class MainActivity : AppCompatActivity() {
 	lateinit var panoramaTextureView: PanoramaView
 	lateinit var btnGyroController: Button
 	lateinit var btnMeshType: Button
+	lateinit var seekBarTouchSensitivity: SeekBar
+	lateinit var tvTouchSensitivity: TextView
 
 	@SuppressLint("MissingInflatedId")
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +34,8 @@ class MainActivity : AppCompatActivity() {
 		panoramaTextureView = findViewById(R.id.panorama)
 		btnGyroController = findViewById(R.id.btn_gyro_controller)
 		btnMeshType = findViewById(R.id.btn_mesh_type)
+		seekBarTouchSensitivity = findViewById(R.id.seekbar_touch_sensitivity)
+		tvTouchSensitivity = findViewById(R.id.tv_touch_sensitivity)
 
 		// 使用本地全景图（MVDiffusion 生成的）
 		val bitmap = BitmapFactory.decodeResource(resources, R.drawable.pano)
@@ -40,6 +47,9 @@ class MainActivity : AppCompatActivity() {
 
 		// 初始化模型类型按钮
 		updateMeshTypeButton()
+
+		// 初始化触摸灵敏度调节器
+		setupTouchSensitivitySeekBar()
 	}
 
 	fun recenter(view: View?) {
@@ -75,6 +85,44 @@ class MainActivity : AppCompatActivity() {
 			MeshType.SPHERE -> "球体 (Sphere)"
 			MeshType.CYLINDER -> "圆柱体 (Cylinder)"
 		}
+	}
+
+	/**
+	 * 设置触摸灵敏度调节器
+	 */
+	private fun setupTouchSensitivitySeekBar() {
+		// SeekBar 范围：0-200，对应灵敏度 0.0-2.0
+		// 默认值 50 对应灵敏度 0.5
+		val currentSensitivity = panoramaTextureView.getTouchSensitivity()
+		val progress = (currentSensitivity * 100).toInt().coerceIn(0, 200)
+		seekBarTouchSensitivity.progress = progress
+		updateTouchSensitivityText(currentSensitivity)
+
+		seekBarTouchSensitivity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+			override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+				if (fromUser) {
+					// 将进度值转换为灵敏度：0-200 -> 0.0-2.0
+					val sensitivity = progress / 100f
+					panoramaTextureView.setTouchSensitivity(sensitivity)
+					updateTouchSensitivityText(sensitivity)
+				}
+			}
+
+			override fun onStartTrackingTouch(seekBar: SeekBar?) {
+				// 开始拖动时不做处理
+			}
+
+			override fun onStopTrackingTouch(seekBar: SeekBar?) {
+				// 停止拖动时不做处理
+			}
+		})
+	}
+
+	/**
+	 * 更新触摸灵敏度显示文本
+	 */
+	private fun updateTouchSensitivityText(sensitivity: Float) {
+		tvTouchSensitivity.text = String.format(Locale.getDefault(), "%.2f", sensitivity)
 	}
 
 }
