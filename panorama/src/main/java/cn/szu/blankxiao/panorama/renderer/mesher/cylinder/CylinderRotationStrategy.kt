@@ -12,8 +12,11 @@ import cn.szu.blankxiao.panorama.renderer.mesher.PanoramaRotationStrategy
  */
 class CylinderRotationStrategy : PanoramaRotationStrategy {
 
-	// 触摸开始时的 yaw 矩阵（从 rotationMatrix * biasMatrix 提取）
+	// 触摸开始时的 yaw 矩阵（从 rotationMatrix * biasMatrix 提取，OpenGL Y-rotation）
 	private var touchBaseYawMatrix = FloatArray(16).also { Matrix.setIdentityM(it, 0) }
+
+	// 触摸开始时的 yaw 角度（度，传感器坐标系 Z 轴旋转角）
+	private var touchBaseYawAngle: Float = 0f
 
 	// 累积的触摸 yaw 角度（度）
 	private var touchYawDelta: Float = 0f
@@ -45,6 +48,10 @@ class CylinderRotationStrategy : PanoramaRotationStrategy {
 		val combinedMatrix = FloatArray(16)
 		Matrix.multiplyMM(combinedMatrix, 0, rotationMatrix, 0, biasMatrix, 0)
 		touchBaseYawMatrix = extractYawRotation(combinedMatrix)
+		// 保存传感器坐标系中的 yaw 角度（度），供 onTouchEnd 使用
+		touchBaseYawAngle = Math.toDegrees(
+			Math.atan2(combinedMatrix[1].toDouble(), combinedMatrix[0].toDouble())
+		).toFloat()
 		touchYawDelta = 0f
 	}
 
@@ -55,41 +62,25 @@ class CylinderRotationStrategy : PanoramaRotationStrategy {
 	}
 
 	override fun onTouchEnd(rotationMatrix: FloatArray, biasMatrix: FloatArray): FloatArray {
-		val finalYawMatrix = if (Math.abs(touchYawDelta) > 0.01f) {
-			val deltaYawMatrix = FloatArray(16)
-			Matrix.setIdentityM(deltaYawMatrix, 0)
-			Matrix.rotateM(deltaYawMatrix, 0, touchYawDelta, 0f, 1f, 0f)
-			val result = FloatArray(16)
-			Matrix.multiplyMM(result, 0, touchBaseYawMatrix, 0, deltaYawMatrix, 0)
-			result
-		} else {
-			touchBaseYawMatrix
-		}
+		// 1. 计算期望的最终 yaw 角度（度）
+		//    触摸中相机显示的是 rotateY(touchBaseYawAngle + touchYawDelta)
+		//    松手后需要保持同一视角
+		val finalYawAngleDeg = touchBaseYawAngle + touchYawDelta
 
-		val currentCombined = FloatArray(16)
-		Matrix.multiplyMM(currentCombined, 0, rotationMatrix, 0, biasMatrix, 0)
-		val currentYawMatrix = extractYawRotation(currentCombined)
+		// 2. 构建传感器坐标系中的目标旋转矩阵
+		//    传感器坐标系中 yaw = 绕 Z 轴旋转
+		//    extractYaw(rotZ(θ)) = atan2(sin(θ), cos(θ)) = θ → rotateY(θ) ✓
+		val targetSensorMatrix = FloatArray(16)
+		Matrix.setIdentityM(targetSensorMatrix, 0)
+		Matrix.rotateM(targetSensorMatrix, 0, finalYawAngleDeg, 0f, 0f, 1f)
 
-		val invCurrentYawMatrix = FloatArray(16)
-		Matrix.invertM(invCurrentYawMatrix, 0, currentYawMatrix, 0)
-		val deltaYawMatrix = FloatArray(16)
-		Matrix.multiplyMM(deltaYawMatrix, 0, invCurrentYawMatrix, 0, finalYawMatrix, 0)
-
-		val deltaYawRad = Math.atan2(deltaYawMatrix[1].toDouble(), deltaYawMatrix[0].toDouble())
-		var deltaYaw = Math.toDegrees(deltaYawRad).toFloat()
-		while (deltaYaw > 180f) deltaYaw -= 360f
-		while (deltaYaw < -180f) deltaYaw += 360f
-
-		val newBiasMatrix = if (Math.abs(deltaYaw) > 0.01f) {
-			val deltaMatrix = FloatArray(16)
-			Matrix.setIdentityM(deltaMatrix, 0)
-			Matrix.rotateM(deltaMatrix, 0, deltaYaw, 0f, 1f, 0f)
-			val result = FloatArray(16)
-			Matrix.multiplyMM(result, 0, biasMatrix, 0, deltaMatrix, 0)
-			result
-		} else {
-			biasMatrix.copyOf()
-		}
+		// 3. 反推 newBias = R⁻¹ × targetSensorMatrix
+		//    使得 R × newBias = targetSensorMatrix
+		//    gyro 模式下 extractYaw(R × newBias) = extractYaw(rotZ(θ)) = rotateY(θ) ✓
+		val invRotationMatrix = FloatArray(16)
+		Matrix.invertM(invRotationMatrix, 0, rotationMatrix, 0)
+		val newBiasMatrix = FloatArray(16)
+		Matrix.multiplyMM(newBiasMatrix, 0, invRotationMatrix, 0, targetSensorMatrix, 0)
 
 		touchYawDelta = 0f
 
