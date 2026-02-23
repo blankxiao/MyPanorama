@@ -12,7 +12,7 @@ import android.view.TextureView
 import android.widget.FrameLayout
 import cn.szu.blankxiao.panorama.cg.gl.GLProducerThread
 import cn.szu.blankxiao.panorama.cg.mesh.MeshType
-import cn.szu.blankxiao.panorama.sphere.SphereRenderer
+import cn.szu.blankxiao.panorama.renderer.Renderer
 import cn.szu.blankxiao.panorama.utils.ImageUtil
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -29,7 +29,7 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 	var renderView: TextureView
 
 	// 渲染器
-	var renderer: SphereRenderer
+	var renderer: Renderer
 
 	// 渲染线程 继承Thread
 	lateinit var producerThread: GLProducerThread
@@ -54,7 +54,7 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 			placeHolder = BitmapFactory.decodeResource(resources, R.color.black)
 
 			renderView = TextureView(context)
-			renderer = SphereRenderer(context)
+			renderer = Renderer(context)
 			renderView.surfaceTextureListener = this
 			// 设置 renderView 不拦截触摸事件，让父视图处理
 			renderView.setOnTouchListener { _, _ -> false }

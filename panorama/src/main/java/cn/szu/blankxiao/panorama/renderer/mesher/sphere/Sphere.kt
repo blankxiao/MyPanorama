@@ -1,4 +1,4 @@
-package cn.szu.blankxiao.panorama.sphere
+package cn.szu.blankxiao.panorama.renderer.mesher.sphere
 
 import cn.szu.blankxiao.panorama.cg.mesh.MeshType
 import cn.szu.blankxiao.panorama.cg.mesh.PanoramaMesh
@@ -147,6 +147,5 @@ class Sphere : PanoramaMesh {
 			return sphere
 		}
 	}
-
-
 }
+
