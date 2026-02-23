@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MyPanorama</string>
+    <string name="nav_panorama">全景</string>
+    <string name="nav_draw">绘制</string>
+    <string name="nav_profile">我的</string>
+    <string name="draw_placeholder">绘制页面（占位）</string>
+    <string name="profile_placeholder">个人信息（占位）</string>
 </resources>

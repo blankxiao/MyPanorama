@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/panorama">
+
+    <fragment
+        android:id="@+id/panorama"
+        android:name="cn.szu.blankxiao.panoramaview.PanoramaFragment"
+        android:label="@string/nav_panorama" />
+    <fragment
+        android:id="@+id/draw"
+        android:name="cn.szu.blankxiao.panoramaview.DrawFragment"
+        android:label="@string/nav_draw" />
+    <fragment
+        android:id="@+id/profile"
+        android:name="cn.szu.blankxiao.panoramaview.ProfileFragment"
+        android:label="@string/nav_profile" />
+</navigation>

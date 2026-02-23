@@ -1,7 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- 夜间模式：深色背景，主色略调暗 -->
     <style name="Base.Theme.PanoramaView" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
     </style>
 </resources>

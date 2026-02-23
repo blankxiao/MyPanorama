@@ -2,4 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- 清新风格主题 -->
+    <color name="primary">#5DB0B2</color>
+    <color name="primary_dark">#4A9A9C</color>
+    <color name="primary_variant">#4A9A9C</color>
+    <color name="background">#F8FBF9</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="on_primary">#FFFFFF</color>
 </resources>

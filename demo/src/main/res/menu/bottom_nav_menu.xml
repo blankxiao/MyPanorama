@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/panorama"
+        android:icon="@drawable/ic_nav_panorama"
+        android:title="@string/nav_panorama" />
+    <item
+        android:id="@+id/draw"
+        android:icon="@drawable/ic_nav_draw"
+        android:title="@string/nav_draw" />
+    <item
+        android:id="@+id/profile"
+        android:icon="@drawable/ic_nav_profile"
+        android:title="@string/nav_profile" />
+</menu>
