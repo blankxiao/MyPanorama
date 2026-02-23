@@ -237,6 +237,21 @@ class Renderer(val context: Context) :
 	 */
 	fun getMeshType(): MeshType = currentMeshType
 
+	/**
+	 * 设置 FOV（视场角）
+	 * @param fovDegrees 视场角（度），范围 [Camera.MIN_FOV, Camera.MAX_FOV]
+	 */
+	fun setFov(fovDegrees: Float) {
+		if (::camera.isInitialized) {
+			camera.updateProjectionMatrix(fovDegrees)
+		}
+	}
+
+	/**
+	 * 获取当前 FOV
+	 */
+	fun getFov(): Float = if (::camera.isInitialized) camera.currentFov else Camera.DEFAULT_FOV
+
 
 	/**
 	 * 控制相机旋转
