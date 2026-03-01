@@ -2,18 +2,33 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/panorama">
+    app:startDestination="@id/resources">
 
+    <!-- 底部导航三个 Tab -->
+    <fragment
+        android:id="@+id/resources"
+        android:name="cn.szu.blankxiao.panoramaview.ui.resouces.ResourcesFragment"
+        android:label="@string/nav_resources" />
+    <fragment
+        android:id="@+id/create"
+        android:name="cn.szu.blankxiao.panoramaview.ui.task.CreateTaskFragment"
+        android:label="@string/nav_create" />
+    <fragment
+        android:id="@+id/profile"
+        android:name="cn.szu.blankxiao.panoramaview.ui.profile.ProfileFragment"
+        android:label="@string/nav_profile_tab" />
+
+    <!-- 次级页面 -->
     <fragment
         android:id="@+id/panorama"
-        android:name="cn.szu.blankxiao.panoramaview.PanoramaFragment"
+        android:name="cn.szu.blankxiao.panoramaview.ui.resouces.PanoramaFragment"
         android:label="@string/nav_panorama" />
     <fragment
         android:id="@+id/draw"
-        android:name="cn.szu.blankxiao.panoramaview.DrawFragment"
+        android:name="cn.szu.blankxiao.panoramaview.ui.task.DrawFragment"
         android:label="@string/nav_draw" />
     <fragment
-        android:id="@+id/profile"
-        android:name="cn.szu.blankxiao.panoramaview.ProfileFragment"
-        android:label="@string/nav_profile" />
+        android:id="@+id/about"
+        android:name="cn.szu.blankxiao.panoramaview.ui.profile.AboutFragment"
+        android:label="@string/about" />
 </navigation>

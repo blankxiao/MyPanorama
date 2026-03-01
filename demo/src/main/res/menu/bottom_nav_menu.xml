@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
-        android:id="@+id/panorama"
-        android:icon="@drawable/ic_nav_panorama"
-        android:title="@string/nav_panorama" />
+        android:id="@+id/resources"
+        android:icon="@drawable/ic_nav_resources"
+        android:title="@string/nav_resources" />
     <item
-        android:id="@+id/draw"
-        android:icon="@drawable/ic_nav_draw"
-        android:title="@string/nav_draw" />
+        android:id="@+id/create"
+        android:icon="@drawable/ic_nav_create"
+        android:title="@string/nav_create" />
     <item
         android:id="@+id/profile"
         android:icon="@drawable/ic_nav_profile"
-        android:title="@string/nav_profile" />
+        android:title="@string/nav_profile_tab" />
 </menu>

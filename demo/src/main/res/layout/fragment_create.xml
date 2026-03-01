@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:padding="16dp"
-    tools:context=".ui.task.DrawFragment">
+    tools:context=".ui.task.CreateTaskFragment">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/draw_placeholder"
-        android:textSize="18sp"
-        android:textColor="?attr/colorOnSurface" />
+        android:text="@string/create_placeholder"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="15sp"
+        android:alpha="0.5" />
 </FrameLayout>

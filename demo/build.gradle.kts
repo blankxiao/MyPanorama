@@ -47,7 +47,21 @@ dependencies {
 	implementation(libs.androidx.navigation.ui.ktx)
 	implementation(project(":panorama"))
 
+	// 后端接入：HTTP + JSON + WebSocket(OkHttp) + 协程 + Token 存储
+	implementation(libs.retrofit)
+	implementation(libs.retrofit.converter.moshi)
+	implementation(libs.okhttp)
+	implementation(libs.okhttp.logging)
+	implementation(libs.moshi)
+	implementation(libs.moshi.kotlin)
+	implementation(libs.kotlinx.coroutines.android)
+	implementation(libs.androidx.lifecycle.viewmodel.ktx)
+	implementation(libs.androidx.lifecycle.runtime.ktx)
+	implementation(libs.androidx.datastore.preferences)
+	implementation(libs.androidx.viewpager2)
+
 	testImplementation(libs.junit)
+	testImplementation(libs.kotlinx.coroutines.android)
 	androidTestImplementation(libs.androidx.junit)
 	androidTestImplementation(libs.androidx.espresso.core)
 }

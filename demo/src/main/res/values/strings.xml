@@ -2,7 +2,37 @@
     <string name="app_name">MyPanorama</string>
     <string name="nav_panorama">全景</string>
     <string name="nav_draw">绘制</string>
-    <string name="nav_profile">我的</string>
+    <string name="nav_resources">资源</string>
+    <string name="nav_create">创建</string>
+    <string name="nav_profile_tab">我的</string>
+
+    <!-- 资源 Tab 内的子 Tab -->
+    <string name="tab_gallery">展示</string>
+    <string name="tab_create">创建</string>
+
+    <!-- 展示子页 -->
+    <string name="gallery_empty_hint">暂无全景图，去体验一下吧</string>
+    <string name="gallery_try_demo">查看示例全景图</string>
+    <string name="gallery_hint">滑动或旋转手机查看全景 · 双击全屏</string>
+
+    <!-- 创建子页(任务进度) -->
+    <string name="tasks_empty_hint">暂无任务，登录后可创建全景生成任务</string>
+
+    <!-- 创建 Tab (底部) -->
+    <string name="create_placeholder">创建功能即将上线</string>
+
+    <!-- 登录相关 -->
+    <string name="login">登 录</string>
+    <string name="login_subtitle">登录以使用全景生成服务</string>
+    <string name="hint_email">邮箱</string>
+    <string name="hint_password">密码</string>
+    <string name="logout">退出登录</string>
+    <string name="go_login">登录 / 注册</string>
+    <string name="not_logged_in">未登录</string>
+    <string name="profile_unknown_user">未知用户</string>
+
+    <!-- 其他 -->
     <string name="draw_placeholder">绘制页面（占位）</string>
-    <string name="profile_placeholder">个人信息（占位）</string>
+    <string name="about">关于</string>
+    <string name="about_desc">MyPanorama 是一款全景图生成与展示工具。\n上传手绘草图，AI 自动生成 360° 全景图。</string>
 </resources>

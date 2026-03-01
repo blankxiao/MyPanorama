@@ -1,4 +1,4 @@
-package cn.szu.blankxiao.panoramaview
+package cn.szu.blankxiao.panoramaview.ui.resouces
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
@@ -17,6 +17,8 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import cn.szu.blankxiao.panorama.PanoramaView
 import cn.szu.blankxiao.panorama.cg.mesh.MeshType
+import cn.szu.blankxiao.panoramaview.FullscreenHost
+import cn.szu.blankxiao.panoramaview.R
 import java.util.Locale
 
 class PanoramaFragment : Fragment() {
@@ -39,9 +41,9 @@ class PanoramaFragment : Fragment() {
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_panorama, container, false)
     }
@@ -76,7 +78,7 @@ class PanoramaFragment : Fragment() {
     }
 
     private fun updateFovText(fov: Float) {
-        tvFov.text = String.format(Locale.getDefault(), "%.0f°", fov)
+        tvFov.text = String.Companion.format(Locale.getDefault(), "%.0f°", fov)
     }
 
     private fun toggleFullscreen() {
@@ -158,6 +160,6 @@ class PanoramaFragment : Fragment() {
     }
 
     private fun updateTouchSensitivityText(sensitivity: Float) {
-        tvTouchSensitivity.text = String.format(Locale.getDefault(), "%.2f", sensitivity)
+        tvTouchSensitivity.text = String.Companion.format(Locale.getDefault(), "%.2f", sensitivity)
     }
 }

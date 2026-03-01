@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:padding="16dp"
-    tools:context=".PanoramaFragment">
+    tools:context=".ui.resouces.PanoramaFragment">
 
     <cn.szu.blankxiao.panorama.PanoramaView
         android:id="@+id/panorama"
