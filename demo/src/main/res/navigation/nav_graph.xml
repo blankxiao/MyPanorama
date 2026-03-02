@@ -20,10 +20,6 @@
 
     <!-- 次级页面 -->
     <fragment
-        android:id="@+id/panorama"
-        android:name="cn.szu.blankxiao.panoramaview.ui.resources.PanoramaFragment"
-        android:label="@string/nav_panorama" />
-    <fragment
         android:id="@+id/draw"
         android:name="cn.szu.blankxiao.panoramaview.ui.task.DrawFragment"
         android:label="@string/nav_draw" />

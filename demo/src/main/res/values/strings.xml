@@ -48,6 +48,17 @@
     <string name="not_logged_in">未登录</string>
     <string name="profile_unknown_user">未知用户</string>
 
+    <!-- 全景详情页 -->
+    <string name="panorama_hint_doubletap">双击全景图进入/退出全屏</string>
+    <string name="panorama_section_controls">显示控制</string>
+    <string name="label_sensitivity">灵敏度：</string>
+    <string name="btn_recenter">复位</string>
+    <string name="demo_panorama_name">示例全景图</string>
+    <string name="gyro_off">关闭陀螺仪</string>
+    <string name="gyro_on">打开陀螺仪</string>
+    <string name="mesh_sphere">球体</string>
+    <string name="mesh_cylinder">圆柱体</string>
+
     <!-- 其他 -->
     <string name="draw_placeholder">绘制页面（占位）</string>
     <string name="about">关于</string>

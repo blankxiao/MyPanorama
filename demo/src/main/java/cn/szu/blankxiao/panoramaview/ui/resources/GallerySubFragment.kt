@@ -1,12 +1,12 @@
 package cn.szu.blankxiao.panoramaview.ui.resources
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import cn.szu.blankxiao.panoramaview.R
 import com.google.android.material.button.MaterialButton
@@ -32,7 +32,7 @@ class GallerySubFragment : Fragment() {
         layoutEmpty.visibility = View.VISIBLE
 
         btnDemo.setOnClickListener {
-            findNavController().navigate(R.id.panorama)
+            startActivity(Intent(requireContext(), PanoramaActivity::class.java))
         }
     }
 }
