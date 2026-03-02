@@ -1,11 +1,8 @@
-package cn.szu.blankxiao.panoramaview.api.dto
+package cn.szu.blankxiao.panoramaview.api.common
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-/**
- * 与后端 Result 一致：success, code, info, data
- */
 @JsonClass(generateAdapter = true)
 data class Result<T>(
     @Json(name = "success") val success: Boolean? = null,

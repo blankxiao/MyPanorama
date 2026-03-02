@@ -1,4 +1,4 @@
-package cn.szu.blankxiao.panoramaview.ui.resouces
+package cn.szu.blankxiao.panoramaview.ui.resources
 
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
@@ -17,7 +17,7 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import cn.szu.blankxiao.panorama.PanoramaView
 import cn.szu.blankxiao.panorama.cg.mesh.MeshType
-import cn.szu.blankxiao.panoramaview.FullscreenHost
+import cn.szu.blankxiao.panoramaview.ui.FullscreenHost
 import cn.szu.blankxiao.panoramaview.R
 import java.util.Locale
 

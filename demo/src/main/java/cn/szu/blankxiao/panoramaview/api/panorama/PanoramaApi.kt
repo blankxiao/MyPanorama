@@ -1,9 +1,9 @@
-package cn.szu.blankxiao.panoramaview.api
+package cn.szu.blankxiao.panoramaview.api.panorama
 
-import cn.szu.blankxiao.panoramaview.api.dto.CreateTaskRequestDto
-import cn.szu.blankxiao.panoramaview.api.dto.PanoramaTaskDetailDto
-import cn.szu.blankxiao.panoramaview.api.dto.PanoramaTaskListItemDto
-import cn.szu.blankxiao.panoramaview.api.dto.Result
+import cn.szu.blankxiao.panoramaview.api.common.Result
+import cn.szu.blankxiao.panoramaview.api.panorama.dto.CreateTaskRequestDto
+import cn.szu.blankxiao.panoramaview.api.panorama.dto.PanoramaTaskDetailDto
+import cn.szu.blankxiao.panoramaview.api.panorama.dto.PanoramaTaskListItemDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -11,11 +11,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-/**
- * 全景图后端接口，路径与后端 PanoramaController 一致。
- */
 interface PanoramaApi {
-
     @GET("panorama/health")
     suspend fun health(): Response<Map<String, Any>>
 

@@ -1,11 +1,8 @@
-package cn.szu.blankxiao.panoramaview.api.dto
+package cn.szu.blankxiao.panoramaview.api.auth.dto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-/**
- * 登录请求。loginType: EMAIL_CODE | EMAIL_PASSWORD
- */
 @JsonClass(generateAdapter = true)
 data class LoginRequestDto(
     @Json(name = "email") val email: String,

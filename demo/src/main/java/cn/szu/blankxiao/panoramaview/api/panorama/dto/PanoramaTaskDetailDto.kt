@@ -1,4 +1,4 @@
-package cn.szu.blankxiao.panoramaview.api.dto
+package cn.szu.blankxiao.panoramaview.api.panorama.dto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

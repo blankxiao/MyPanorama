@@ -1,4 +1,4 @@
-package cn.szu.blankxiao.panoramaview.ui.resouces
+package cn.szu.blankxiao.panoramaview.ui.resources
 
 import android.os.Bundle
 import android.view.LayoutInflater

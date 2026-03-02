@@ -3,12 +3,12 @@
     <string name="nav_panorama">全景</string>
     <string name="nav_draw">绘制</string>
     <string name="nav_resources">资源</string>
-    <string name="nav_create">创建</string>
+    <string name="nav_create">新建</string>
     <string name="nav_profile_tab">我的</string>
 
     <!-- 资源 Tab 内的子 Tab -->
     <string name="tab_gallery">展示</string>
-    <string name="tab_create">创建</string>
+    <string name="tab_create">任务</string>
 
     <!-- 展示子页 -->
     <string name="gallery_empty_hint">暂无全景图，去体验一下吧</string>
@@ -21,11 +21,28 @@
     <!-- 创建 Tab (底部) -->
     <string name="create_placeholder">创建功能即将上线</string>
 
-    <!-- 登录相关 -->
+    <!-- 登录/注册/重置 -->
     <string name="login">登 录</string>
+    <string name="register">注 册</string>
     <string name="login_subtitle">登录以使用全景生成服务</string>
+    <string name="subtitle_code_login">使用邮箱验证码登录</string>
+    <string name="subtitle_register">创建新账号</string>
+    <string name="subtitle_reset_pw">通过邮箱验证码重置密码</string>
     <string name="hint_email">邮箱</string>
     <string name="hint_password">密码</string>
+    <string name="hint_new_password">新密码</string>
+    <string name="hint_code">验证码</string>
+    <string name="hint_username">用户名</string>
+    <string name="send_code">获取验证码</string>
+    <string name="code_sent">验证码已发送</string>
+    <string name="switch_code_login">验证码登录</string>
+    <string name="switch_password_login">密码登录</string>
+    <string name="forgot_password">忘记密码</string>
+    <string name="reset_password">重置密码</string>
+    <string name="reset_pw_success">密码重置成功，请重新登录</string>
+    <string name="go_register">没有账号？去注册</string>
+    <string name="already_have_account">已有账号？去登录</string>
+    <string name="back_to_login">返回登录</string>
     <string name="logout">退出登录</string>
     <string name="go_login">登录 / 注册</string>
     <string name="not_logged_in">未登录</string>

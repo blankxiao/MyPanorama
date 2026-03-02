@@ -7,7 +7,7 @@
     <!-- 底部导航三个 Tab -->
     <fragment
         android:id="@+id/resources"
-        android:name="cn.szu.blankxiao.panoramaview.ui.resouces.ResourcesFragment"
+        android:name="cn.szu.blankxiao.panoramaview.ui.resources.ResourcesFragment"
         android:label="@string/nav_resources" />
     <fragment
         android:id="@+id/create"
@@ -21,7 +21,7 @@
     <!-- 次级页面 -->
     <fragment
         android:id="@+id/panorama"
-        android:name="cn.szu.blankxiao.panoramaview.ui.resouces.PanoramaFragment"
+        android:name="cn.szu.blankxiao.panoramaview.ui.resources.PanoramaFragment"
         android:label="@string/nav_panorama" />
     <fragment
         android:id="@+id/draw"

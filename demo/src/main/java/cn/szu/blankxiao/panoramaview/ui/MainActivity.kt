@@ -5,7 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import cn.szu.blankxiao.panoramaview.FullscreenHost
+import cn.szu.blankxiao.panoramaview.ui.FullscreenHost
 import cn.szu.blankxiao.panoramaview.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
