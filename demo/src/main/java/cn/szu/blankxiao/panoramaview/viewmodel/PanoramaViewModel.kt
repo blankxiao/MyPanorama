@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import cn.szu.blankxiao.panoramaview.api.common.PushEventMessage
 import cn.szu.blankxiao.panoramaview.api.panorama.PanoramaApi
 import cn.szu.blankxiao.panoramaview.api.panorama.dto.CreateTaskRequestDto
 import cn.szu.blankxiao.panoramaview.api.panorama.dto.PanoramaTaskDetailDto
@@ -11,9 +12,14 @@ import cn.szu.blankxiao.panoramaview.api.panorama.dto.PanoramaTaskListItemDto
 import cn.szu.blankxiao.panoramaview.data.TokenManager
 import cn.szu.blankxiao.panoramaview.network.RetrofitProvider
 import cn.szu.blankxiao.panoramaview.network.TokenProvider
+import cn.szu.blankxiao.panoramaview.network.WebSocketManager
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 data class CreateTaskUiState(
@@ -62,6 +68,25 @@ class PanoramaViewModel(application: Application) : AndroidViewModel(application
 
     private val _detailState = MutableStateFlow(TaskDetailUiState())
     val detailState: StateFlow<TaskDetailUiState> = _detailState.asStateFlow()
+
+    private val _toastMessage = MutableSharedFlow<String>(replay = 0, extraBufferCapacity = 16)
+    val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow()
+
+    init {
+        viewModelScope.launch {
+            WebSocketManager.events
+                .filter { it.type == "panorama_task_done" }
+                .collect { event ->
+                    loadTaskList()
+                    loadResultList()
+                    val msg = event.data?.let { d ->
+                        if (d.status == "completed") "任务 #${d.taskId} 已完成"
+                        else "任务 #${d.taskId}: ${d.status}${d.errorMessage?.let { " - $it" }.orEmpty()}"
+                    } ?: "任务已完成"
+                    _toastMessage.emit(msg)
+                }
+        }
+    }
 
     fun createTask(prompt: String, name: String? = null, mode: String? = null, inputImageUrl: String? = null) {
         if (prompt.isBlank()) {
