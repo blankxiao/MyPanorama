@@ -18,8 +18,17 @@
     <!-- 创建子页(任务进度) -->
     <string name="tasks_empty_hint">暂无任务，登录后可创建全景生成任务</string>
 
-    <!-- 创建 Tab (底部) -->
-    <string name="create_placeholder">创建功能即将上线</string>
+    <!-- 创建任务页 -->
+    <string name="create_title">创建全景任务</string>
+    <string name="create_subtitle">输入描述，AI 自动生成 360° 全景图</string>
+    <string name="create_label_mode">生成模式</string>
+    <string name="mode_text2pano">文生全景</string>
+    <string name="mode_outpaint">图文外扩</string>
+    <string name="create_hint_name">任务名称（可选）</string>
+    <string name="create_hint_prompt">描述你想要的全景场景 *</string>
+    <string name="create_hint_input_image">输入图 URL（outpaint 模式必填）</string>
+    <string name="create_btn_submit">提交任务</string>
+    <string name="create_success">任务创建成功，ID: %1$d</string>
 
     <!-- 登录/注册/重置 -->
     <string name="login">登 录</string>

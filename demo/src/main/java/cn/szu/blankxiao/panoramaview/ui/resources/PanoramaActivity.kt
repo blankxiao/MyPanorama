@@ -27,6 +27,7 @@ class PanoramaActivity : AppCompatActivity() {
         const val EXTRA_RESOURCE_NAME = "resource_name"
         const val EXTRA_RESOURCE_TIME = "resource_time"
         const val EXTRA_RESOURCE_MODE = "resource_mode"
+        const val EXTRA_RESOURCE_URL = "resource_url"
     }
 
     private lateinit var panoramaView: PanoramaView
@@ -59,9 +60,13 @@ class PanoramaActivity : AppCompatActivity() {
     }
 
     private fun loadPanorama() {
-        // TODO: 根据 EXTRA_RESOURCE_ID 从网络加载全景图
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.pano)
-        panoramaView.setBitmap(bitmap)
+        val url = intent.getStringExtra(EXTRA_RESOURCE_URL)
+        if (!url.isNullOrBlank()) {
+            panoramaView.setBitmapUrl(url)
+        } else {
+            val bitmap = BitmapFactory.decodeResource(resources, R.drawable.pano)
+            panoramaView.setBitmap(bitmap)
+        }
         panoramaView.setGyroTrackingEnabled(true)
     }
 

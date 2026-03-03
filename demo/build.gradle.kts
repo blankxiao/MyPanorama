@@ -59,6 +59,7 @@ dependencies {
 	implementation(libs.androidx.lifecycle.runtime.ktx)
 	implementation(libs.androidx.datastore.preferences)
 	implementation(libs.androidx.viewpager2)
+	implementation(libs.androidx.swiperefreshlayout)
 
 	testImplementation(libs.junit)
 	testImplementation(libs.kotlinx.coroutines.android)

@@ -5,27 +5,68 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.szu.blankxiao.panoramaview.R
+import cn.szu.blankxiao.panoramaview.viewmodel.PanoramaViewModel
+import kotlinx.coroutines.launch
 
-/**
- * 资源 Tab 内的"创建"子页：列表展示各任务的进度，点击进入任务详情。
- */
 class TasksSubFragment : Fragment() {
 
+    private val vm: PanoramaViewModel by activityViewModels()
+
     override fun onCreateView(
-		inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.fragment_tasks_sub, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh)
         val rvTasks = view.findViewById<RecyclerView>(R.id.rv_tasks)
         val layoutEmpty = view.findViewById<LinearLayout>(R.id.layout_tasks_empty)
 
-        // TODO: 接入后端数据后替换为真实列表
-        rvTasks.visibility = View.GONE
-        layoutEmpty.visibility = View.VISIBLE
+        val adapter = TaskAdapter { task ->
+            Toast.makeText(requireContext(), "任务 #${task.id}: ${TaskAdapter.mapStatus(task.status)}", Toast.LENGTH_SHORT).show()
+        }
+        rvTasks.adapter = adapter
+
+        swipeRefresh.setOnRefreshListener { vm.loadTaskList() }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.taskListState.collect { state ->
+                    swipeRefresh.isRefreshing = state.refreshing
+
+                    if (state.tasks.isEmpty() && !state.refreshing) {
+                        rvTasks.visibility = View.GONE
+                        layoutEmpty.visibility = View.VISIBLE
+                        if (state.errorMsg != null) {
+                            view.findViewById<TextView>(R.id.tv_tasks_empty_text)?.text = state.errorMsg
+                        }
+                    } else if (state.tasks.isNotEmpty()) {
+                        rvTasks.visibility = View.VISIBLE
+                        layoutEmpty.visibility = View.GONE
+                        adapter.submitList(state.tasks)
+                    }
+                }
+            }
+        }
+
+        if (vm.taskListState.value.tasks.isEmpty()) {
+            vm.loadTaskList()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        vm.loadTaskList()
     }
 }
