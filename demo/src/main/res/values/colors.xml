@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <!-- 清新风格主题 -->
+
+    <!-- Light theme: 清新风格 -->
     <color name="primary">#5DB0B2</color>
     <color name="primary_dark">#4A9A9C</color>
     <color name="primary_variant">#4A9A9C</color>
+    <color name="on_primary">#FFFFFFFF</color>
+
     <color name="background">#F8FBF9</color>
-    <color name="surface">#FFFFFF</color>
-    <color name="on_primary">#FFFFFF</color>
+    <color name="on_background">#FF1C1C1C</color>
+
+    <color name="surface">#FFFFFFFF</color>
+    <color name="on_surface">#FF1C1C1C</color>
+    <color name="surface_variant">#FFE8EEED</color>
+    <color name="on_surface_variant">#FF5F6B6C</color>
+
+    <color name="outline">#FF8A9596</color>
+    <color name="outline_variant">#FFDCE3E2</color>
+
+    <!-- Semantic: error, optional -->
+    <color name="error">#FFBA1A1A</color>
+    <color name="on_error">#FFFFFFFF</color>
+
+    <!-- 状态标签背景（任务卡片 Chip） -->
+    <color name="status_pending">#FFE8EEED</color>
+    <color name="status_processing">#FFD4ECEC</color>
+    <color name="status_completed">#FFC8E6C9</color>
+    <color name="status_failed">#FFFFCDD2</color>
 </resources>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 列表 -->
+    <dimen name="list_padding_horizontal">16dp</dimen>
+    <dimen name="list_padding_vertical">8dp</dimen>
+    <dimen name="list_padding_top">8dp</dimen>
+    <dimen name="list_padding_bottom">8dp</dimen>
+
+    <!-- 卡片 -->
+    <dimen name="card_margin">4dp</dimen>
+    <dimen name="card_padding">14dp</dimen>
+    <dimen name="card_corner_radius">12dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_stroke_width">1dp</dimen>
+    <dimen name="card_thumbnail_height">72dp</dimen>
+    <dimen name="card_status_strip_width">4dp</dimen>
+    <dimen name="chip_corner_radius">8dp</dimen>
+
+    <!-- 间距 -->
+    <dimen name="spacing_xs">2dp</dimen>
+    <dimen name="spacing_small">4dp</dimen>
+    <dimen name="spacing_medium">8dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+    <dimen name="spacing_xl">24dp</dimen>
+    <dimen name="spacing_xxl">32dp</dimen>
+    <dimen name="spacing_header_top">40dp</dimen>
+
+    <!-- 空态 / 按钮 -->
+    <dimen name="empty_button_margin_top">16dp</dimen>
+    <dimen name="button_corner_radius">12dp</dimen>
+
+    <!-- 个人中心 -->
+    <dimen name="profile_header_padding_top">40dp</dimen>
+    <dimen name="profile_header_padding_bottom">24dp</dimen>
+    <dimen name="profile_section_padding_horizontal">20dp</dimen>
+    <dimen name="profile_list_item_height">56dp</dimen>
+    <dimen name="profile_avatar_size">64dp</dimen>
+    <dimen name="profile_icon_size">24dp</dimen>
+    <dimen name="profile_icon_margin_start">16dp</dimen>
+    <dimen name="profile_divider_height">1dp</dimen>
+    <dimen name="profile_title_margin_top">12dp</dimen>
+    <dimen name="profile_subtitle_margin_top">4dp</dimen>
+</resources>

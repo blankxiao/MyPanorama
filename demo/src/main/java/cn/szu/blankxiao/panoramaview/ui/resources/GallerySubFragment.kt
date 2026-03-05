@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -32,6 +33,9 @@ class GallerySubFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh)
+        swipeRefresh.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.primary))
+        swipeRefresh.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(requireContext(), R.color.surface))
+
         val rvGallery = view.findViewById<RecyclerView>(R.id.rv_gallery)
         val layoutEmpty = view.findViewById<LinearLayout>(R.id.layout_empty)
         val btnDemo = view.findViewById<MaterialButton>(R.id.btn_demo_panorama)

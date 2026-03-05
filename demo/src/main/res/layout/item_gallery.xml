@@ -1,41 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.PanoramaView.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="4dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="1dp">
+    android:layout_marginHorizontal="@dimen/card_margin"
+    android:layout_marginVertical="@dimen/card_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="14dp">
+        android:orientation="vertical">
+
+        <!-- 缩略图占位（后续可替换为真实图片） -->
+        <FrameLayout
+            android:id="@+id/gallery_thumbnail_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/card_thumbnail_height"
+            android:background="@drawable/bg_thumbnail_placeholder">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_nav_panorama"
+                android:contentDescription="@null"
+                app:tint="?attr/colorOnSurfaceVariant"
+                android:alpha="0.6" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/card_padding">
 
         <TextView
             android:id="@+id/tv_gallery_name"
+            style="@style/Widget.PanoramaView.Text.ListTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface"
             android:maxLines="1"
             android:ellipsize="end" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tv_gallery_mode"
+                style="@style/Widget.PanoramaView.Text.Caption"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:layout_height="wrap_content" />
 
             <View
                 android:layout_width="0dp"
@@ -44,13 +62,13 @@
 
             <TextView
                 android:id="@+id/tv_gallery_time"
+                style="@style/Widget.PanoramaView.Text.Caption"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
+        </LinearLayout>
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

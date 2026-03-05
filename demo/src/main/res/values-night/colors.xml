@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base (unchanged) -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Dark theme: 夜间，主色略柔 -->
+    <color name="primary">#7DD4D6</color>
+    <color name="primary_dark">#5DB0B2</color>
+    <color name="primary_variant">#4A9A9C</color>
+    <color name="on_primary">#FF003436</color>
+
+    <color name="background">#FF121212</color>
+    <color name="on_background">#FFE3E3E3</color>
+
+    <color name="surface">#FF1E1E1E</color>
+    <color name="on_surface">#FFE3E3E3</color>
+    <color name="surface_variant">#FF2D3332</color>
+    <color name="on_surface_variant">#FFBEC8C7</color>
+
+    <color name="outline">#FF8A9596</color>
+    <color name="outline_variant">#FF3D4847</color>
+
+    <color name="error">#FFFFB4AB</color>
+    <color name="on_error">#FF690005</color>
+
+    <color name="status_pending">#FF2D3332</color>
+    <color name="status_processing">#FF1E3A3A</color>
+    <color name="status_completed">#FF1B3220</color>
+    <color name="status_failed">#FF3D2020</color>
+</resources>

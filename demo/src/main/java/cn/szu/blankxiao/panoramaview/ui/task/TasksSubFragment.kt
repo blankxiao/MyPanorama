@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -30,6 +31,9 @@ class TasksSubFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh)
+        swipeRefresh.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.primary))
+        swipeRefresh.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(requireContext(), R.color.surface))
+
         val rvTasks = view.findViewById<RecyclerView>(R.id.rv_tasks)
         val layoutEmpty = view.findViewById<LinearLayout>(R.id.layout_tasks_empty)
 
@@ -55,8 +59,13 @@ class TasksSubFragment : Fragment() {
                     if (state.tasks.isEmpty() && !state.refreshing) {
                         rvTasks.visibility = View.GONE
                         layoutEmpty.visibility = View.VISIBLE
+                        val tvEmpty = view.findViewById<TextView>(R.id.tv_tasks_empty_text)
                         if (state.errorMsg != null) {
-                            view.findViewById<TextView>(R.id.tv_tasks_empty_text)?.text = state.errorMsg
+                            tvEmpty?.text = state.errorMsg
+                            tvEmpty?.setTextAppearance(R.style.Widget_PanoramaView_Text_Error)
+                        } else {
+                            tvEmpty?.setText(R.string.tasks_empty_hint)
+                            tvEmpty?.setTextAppearance(R.style.Widget_PanoramaView_Text_Empty)
                         }
                     } else if (state.tasks.isNotEmpty()) {
                         rvTasks.visibility = View.VISIBLE

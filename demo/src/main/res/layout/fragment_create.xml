@@ -126,21 +126,21 @@
         <!-- 错误提示 -->
         <TextView
             android:id="@+id/tv_error"
+            style="@style/Widget.PanoramaView.Text.Error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textColor="@android:color/holo_red_dark"
             android:textSize="13sp"
             android:visibility="gone" />
 
         <!-- 提交 -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_create"
+            style="@style/Widget.PanoramaView.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/create_btn_submit"
-            app:cornerRadius="12dp" />
+            android:text="@string/create_btn_submit" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress"

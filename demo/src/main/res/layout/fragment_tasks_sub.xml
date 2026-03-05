@@ -15,9 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:paddingHorizontal="@dimen/list_padding_horizontal"
+            android:paddingTop="@dimen/list_padding_top"
+            android:paddingBottom="@dimen/list_padding_bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         <!-- 空态 -->
@@ -31,12 +31,10 @@
 
             <TextView
                 android:id="@+id/tv_tasks_empty_text"
+                style="@style/Widget.PanoramaView.Text.Empty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tasks_empty_hint"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="15sp"
-                android:alpha="0.5" />
+                android:text="@string/tasks_empty_hint" />
 
         </LinearLayout>
 

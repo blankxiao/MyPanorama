@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- 统一使用主题颜色，便于日/夜切换；新布局可引用这些 style -->
+    <style name="Widget.PanoramaView.Text.Title" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+    <style name="Widget.PanoramaView.Text.Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+    <style name="Widget.PanoramaView.Text.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+    <style name="Widget.PanoramaView.Text.ListTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+    <style name="Widget.PanoramaView.Text.Empty" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+    <style name="Widget.PanoramaView.Text.Headline" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+    <style name="Widget.PanoramaView.Text.Error" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">?attr/colorError</item>
+    </style>
+
+    <!-- 主按钮：用于提交、主要 CTA -->
+    <style name="Widget.PanoramaView.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+    </style>
+
+    <!-- 列表卡片统一样式：圆角、轻阴影、细描边、背景随主题 -->
+    <style name="Widget.PanoramaView.Card" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="strokeColor">?attr/colorOutlineVariant</item>
+        <item name="strokeWidth">@dimen/card_stroke_width</item>
+    </style>
+</resources>

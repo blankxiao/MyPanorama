@@ -70,6 +70,10 @@
 
     <!-- 其他 -->
     <string name="draw_placeholder">绘制页面（占位）</string>
+    <string name="theme">主题</string>
+    <string name="theme_follow_system">跟随系统</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
     <string name="about">关于</string>
     <string name="about_desc">MyPanorama 是一款全景图生成与展示工具。\n上传手绘草图，AI 自动生成 360° 全景图。</string>
 </resources>
