@@ -1,11 +1,17 @@
 plugins {
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.android)
+	id("com.google.gms.google-services")
+	id("com.google.firebase.crashlytics")
 }
 
 android {
 	namespace = "cn.szu.blankxiao.panoramaview"
 	compileSdk = 36
+
+	buildFeatures {
+		buildConfig = true
+	}
 
 	defaultConfig {
 		applicationId = "cn.szu.blankxiao.panoramaview"
@@ -60,6 +66,11 @@ dependencies {
 	implementation(libs.androidx.datastore.preferences)
 	implementation(libs.androidx.viewpager2)
 	implementation(libs.androidx.swiperefreshlayout)
+
+	// Firebase / Crashlytics
+	implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
+	implementation("com.google.firebase:firebase-crashlytics")
+	implementation("com.google.firebase:firebase-analytics")
 
 	testImplementation(libs.junit)
 	testImplementation(libs.kotlinx.coroutines.android)

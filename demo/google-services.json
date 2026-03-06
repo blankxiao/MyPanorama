@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "76042722576",
+    "project_id": "mypanorama-e3429",
+    "storage_bucket": "mypanorama-e3429.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76042722576:android:e3bf3bb5e62e08b7151995",
+        "android_client_info": {
+          "package_name": "cn.szu.blankxiao.panoramaview"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOB2TlfPBYj74UCR7BbJ76XOZb6Sh70qQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
