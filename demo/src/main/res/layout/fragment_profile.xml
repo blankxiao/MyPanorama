@@ -26,7 +26,7 @@
                 android:layout_width="@dimen/profile_avatar_size"
                 android:layout_height="@dimen/profile_avatar_size"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher_round"
+                android:src="@mipmap/ic_launcher"
                 app:shapeAppearanceOverlay="@style/CircleImageView" />
 
             <TextView
