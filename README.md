@@ -1,6 +1,6 @@
 # MyPanorama
 
-面向 360° 全景图展示与云端任务管理的 Android 应用。包含自研全景渲染库与示例 App，支持触摸/陀螺仪浏览、任务创建与列表、后端推送与登录等。
+用于展示和生成全景图的app,支持陀螺仪/手势切换视角,球体/圆柱体浏览等功能  
 
 ---
 
@@ -14,8 +14,22 @@
 
 | 模块 | 技术 |
 |------|------|
-| 全景库 (panorama) | Kotlin、OpenGL ES 2.0、自定义 View（PanoramaView）、独立 GL 线程、EGL、Shader/纹理 |
-| 示例 App (demo) | Fragment + Navigation + ViewPager2、ViewModel + StateFlow/SharedFlow、Retrofit + Moshi、OkHttp WebSocket（指数退避重连）、DataStore、Firebase Crashlytics |
+| 全景库 (panorama) | Kotlin、OpenGL ES |
+| 示例 App (demo) | Fragment + Navigation + ViewPager2、ViewModel + StateFlow/SharedFlow、Retrofit + Moshi、OkHttp WebSocket、DataStore |
+
+---
+
+## 快速开始
+
+1. 克隆仓库：
+   ```bash
+   git clone https://github.com/blankxiao/MyPanorama.git
+   cd MyPanorama
+   ```
+2. 用 **Android Studio** 打开项目（选择仓库根目录）。
+3. 连接设备或启动模拟器，运行 **demo** 模块。
+
+> 需 Android SDK 24+，JDK 11+。
 
 ---
 
@@ -23,7 +37,7 @@
 
 ```
 panoramaView/
-├── panorama/     # 全景渲染库（可独立依赖）
+├── panorama/     # 全景渲染库
 └── demo/         # 示例应用
 ```
 
