@@ -118,16 +118,7 @@ class Sphere : PanoramaMesh {
 		 * 创建默认球体
 		 * 半径 5，48x48 分段，完整球面
 		 */
-		fun getDefault(): Sphere {
-			val sphere = Sphere()
-			sphere.generate(
-				5f,
-				48, 48,
-				0.0, Math.PI * 2,
-				0.0, Math.PI
-			)
-			return sphere
-		}
+		fun getDefault(): Sphere = create()
 
 		/**
 		 * 创建自定义球体

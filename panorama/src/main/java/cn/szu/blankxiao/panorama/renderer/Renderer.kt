@@ -98,6 +98,7 @@ class Renderer(val context: Context) :
 	var touchSensitivity: Float = 0.5f
 
 	override fun onGLContextAvailable() {
+		// 注册绑定纹理
 		texture = Texture()
 		texture.create()
 
@@ -142,38 +143,38 @@ class Renderer(val context: Context) :
 	override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
 	override fun onSensorChanged(event: SensorEvent?) {
-		if (event!!.sensor.type == Sensor.TYPE_ROTATION_VECTOR) {
-			if (isFirstFrame) { // 初始化时，先给一个初始角度，以便能绘制出第一帧的图
-				isFirstFrame = false
-				val orientationMatrix = FloatArray(16)
-				Matrix.setIdentityM(orientationMatrix, 0)
+		if (event!!.sensor.type != Sensor.TYPE_ROTATION_VECTOR) return
 
-				if (rotVecValues == null) {
-					rotVecValues = FloatArray(event.values.size)
-				}
-				for (i in rotVecValues!!.indices) {
-					rotVecValues!![i] = event.values[i]
-				}
+		if (isFirstFrame) { // 初始化时，先给一个初始角度，以便能绘制出第一帧的图
+			isFirstFrame = false
+			val orientationMatrix = FloatArray(16)
+			Matrix.setIdentityM(orientationMatrix, 0)
 
-				SensorManager.getQuaternionFromVector(rotationQuaternion, rotVecValues)
-				SensorManager.getRotationMatrixFromVector(orientationMatrix, rotVecValues)
-				rotationMatrix = orientationMatrix
-
-				val invertMatrix = FloatArray(16)
-				Matrix.invertM(invertMatrix, 0, orientationMatrix, 0)
-				biasMatrix = invertMatrix
-				return
+			if (rotVecValues == null) {
+				rotVecValues = FloatArray(event.values.size)
+			}
+			for (i in rotVecValues!!.indices) {
+				rotVecValues!![i] = event.values[i]
 			}
 
-			if (isGyroTrackingEnabled) {
-				for (i in rotVecValues?.indices!!) {
-					rotVecValues?.set(i, event.values[i])
-				}
+			SensorManager.getQuaternionFromVector(rotationQuaternion, rotVecValues)
+			SensorManager.getRotationMatrixFromVector(orientationMatrix, rotVecValues)
+			rotationMatrix = orientationMatrix
 
-				if (rotVecValues != null) {
-					SensorManager.getQuaternionFromVector(rotationQuaternion, rotVecValues)
-					SensorManager.getRotationMatrixFromVector(rotationMatrix, rotVecValues)
-				}
+			val invertMatrix = FloatArray(16)
+			Matrix.invertM(invertMatrix, 0, orientationMatrix, 0)
+			biasMatrix = invertMatrix
+			return
+		}
+
+		if (isGyroTrackingEnabled) {
+			for (i in rotVecValues?.indices!!) {
+				rotVecValues?.set(i, event.values[i])
+			}
+
+			if (rotVecValues != null) {
+				SensorManager.getQuaternionFromVector(rotationQuaternion, rotVecValues)
+				SensorManager.getRotationMatrixFromVector(rotationMatrix, rotVecValues)
 			}
 		}
 	}
@@ -297,7 +298,7 @@ class Renderer(val context: Context) :
 		fragmentShader.bindTextureSampler2D(programHandle, "u_Texture", texture.textureName)
 
 		vertexShader.bindMVPMatrix(programHandle, "u_MVPMatrix", camera.getMVPMatrix())
-
+		// TODO?
 		texture.bindSampler(fragmentShader.getTextureSamplerHandle())
 
 		GLES20.glDrawElements(

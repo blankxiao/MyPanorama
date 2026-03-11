@@ -36,6 +36,10 @@ class EglHelper {
 	// 渲染目标 安卓层面
 	private var targetSurfaceTexture: SurfaceTexture? = null
 
+	/**
+	 * openGL ES仅能确定画什么 需要通过EGL配置画在哪里
+	 * 包括获取设备 绑定EGL环境到当前线程
+	 */
 	fun initEGLContext(surfaceTexture: SurfaceTexture?) {
 		// 获取TextureView内置的SurfaceTexture作为EGL的绘图表面，也就是跟系统屏幕打交道
 		if (surfaceTexture == null) {
@@ -98,7 +102,7 @@ class EglHelper {
 			return
 		}
 
-		// 指定mEGLContext为当前系统的EGL上下文，你可能发现了使用两个mEglSurface，第一个表示绘图表面，第二个表示读取表面
+		// 指定curEGLContext为当前线程的EGL上下文
 		if (!curEGL!!.eglMakeCurrent(curEGLDisplay, curEGLSurface, curEGLSurface, curEGLContext)) {
 			return
 		}

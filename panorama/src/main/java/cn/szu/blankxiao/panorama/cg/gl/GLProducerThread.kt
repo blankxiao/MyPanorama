@@ -15,9 +15,6 @@ class GLProducerThread(
 	var shouldRender: AtomicBoolean
 ) : Thread() {
 
-	// 渲染目标
-	var renderMode = 0
-
 	// EGL相关内容的封装 初始化 刷新 缓存交换 清理
 	var curEGLHelper: EglHelper = EglHelper()
 
@@ -77,8 +74,8 @@ class GLProducerThread(
 
 		while (shouldRender.get()) {
 			// 处理事件
-
-			eventHandler.dequeueEventAndRun() // 先执行事件队列中没完成的任务
+			// 先执行事件队列中没完成的任务
+			eventHandler.dequeueEventAndRun()
 
 			// 渲染
 			textureRenderer.onDrawFrame()

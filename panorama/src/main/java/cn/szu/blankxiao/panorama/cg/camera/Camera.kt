@@ -12,7 +12,8 @@ class Camera(val screenRatio: Float) {
 
 	// model view projection 顶点变换
 	// 原三维顶点 * mvpMatrix 即为二维坐标
-	// viewMatrix * projectionMatrix
+	// projectionMatrix * viewMatrix
+	// 模型坐标和世界坐标一样 无需处理
 	private var mvpMatrix = FloatArray(16)
 
 	// 投影矩阵

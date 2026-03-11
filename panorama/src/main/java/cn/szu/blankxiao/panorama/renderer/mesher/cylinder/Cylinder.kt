@@ -116,16 +116,7 @@ class Cylinder : PanoramaMesh {
 		/**
 		 * 创建默认圆柱体
 		 */
-		fun getDefault(): Cylinder {
-			val cylinder = Cylinder()
-			cylinder.generate(
-				radius = 5f,
-				height = 12f,
-				widthSegments = 48,
-				heightSegments = 24
-			)
-			return cylinder
-		}
+		fun getDefault(): Cylinder = create()
 
 		/**
 		 * 创建自定义圆柱体

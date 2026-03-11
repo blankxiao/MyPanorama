@@ -137,24 +137,4 @@ object OpenGLUtil {
 
 		return array
 	}
-
-	fun makeFrustumMatrix(
-		left: Float, right: Float,
-		bottom: Float, top: Float,
-		nearZ: Float, farZ: Float
-	): FloatArray {
-		val ral = right + left
-		val rsl = right - left
-		val tsb = top - bottom
-		val tab = top + bottom
-		val fan = farZ + nearZ
-		val fsn = farZ - nearZ
-
-		return floatArrayOf(
-			2.0f * nearZ / rsl, 0.0f, 0.0f, 0.0f,
-			0.0f, 2.0f * nearZ / tsb, 0.0f, 0.0f,
-			ral / rsl, tab / tsb, -fan / fsn, -1.0f,
-			0.0f, 0.0f, (-2.0f * farZ * nearZ) / fsn, 0.0f
-		)
-	}
 }

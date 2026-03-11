@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs),
 	TextureView.SurfaceTextureListener {
 
-	// TextureView 作为openGL渲染内容的显示载体 的当前Frame布局的唯一子view
+	// TextureView 作为openGL渲染内容的显示载体 是当前Frame布局的唯一子view
 	// 内部使用了SurfaceTexture 是opengl的直接渲染目标
 	var renderView: TextureView
 
@@ -64,12 +64,12 @@ class PanoramaView(context: Context, attrs: AttributeSet?) : FrameLayout(context
 		if (supportsEs2) {
 			placeHolder = BitmapFactory.decodeResource(resources, R.color.black)
 
-			renderView = TextureView(context)
-			renderer = Renderer(context)
-			renderView.surfaceTextureListener = this
-			// 设置 renderView 不拦截触摸事件，让父视图处理
-			renderView.setOnTouchListener { _, _ -> false }
+			renderView = TextureView(context).apply {
+				surfaceTextureListener = this@PanoramaView
+				setOnTouchListener { _, _ -> false }
+			}
 			addView(renderView)
+			renderer = Renderer(context)
 
 			// 初始化捏合缩放手势
 			scaleGestureDetector = ScaleGestureDetector(context, FovScaleListener())

@@ -14,8 +14,8 @@ void main() {
 	v_Position = vec3(u_MVMatrix * a_Position);
 
     v_Color = a_Color;
-
+    // 纹理坐标 后续片段着色器需要
     v_TextureCoordinates = a_TextureCoordinates;
-
+    // 齐次剪裁坐标
     gl_Position = u_MVPMatrix * a_Position;
 }
