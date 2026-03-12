@@ -6,18 +6,21 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import cn.szu.blankxiao.panoramaview.api.auth.AuthApi
 import cn.szu.blankxiao.panoramaview.api.auth.dto.LoginRequestDto
+import cn.szu.blankxiao.panoramaview.api.auth.dto.LoginResponseDto
 import cn.szu.blankxiao.panoramaview.api.auth.dto.RegisterRequestDto
 import cn.szu.blankxiao.panoramaview.api.auth.dto.ResetPasswordRequestDto
 import cn.szu.blankxiao.panoramaview.api.auth.dto.SendCodeRequestDto
 import cn.szu.blankxiao.panoramaview.data.TokenManager
 import cn.szu.blankxiao.panoramaview.network.RetrofitProvider
 import cn.szu.blankxiao.panoramaview.network.TokenProvider
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 data class LoginUiState(
     val loading: Boolean = false,
@@ -43,7 +46,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val tokenManager = TokenManager.getInstance(application)
 
     private val okHttpClient = RetrofitProvider.createOkHttpClient(
-        tokenProvider = TokenProvider { kotlinx.coroutines.runBlocking { tokenManager.getToken() } }
+        tokenProvider = { runBlocking { tokenManager.getToken() } }
     )
     private val retrofit = RetrofitProvider.createRetrofit(okHttpClient)
     private val authApi: AuthApi = RetrofitProvider.createAuthApi(retrofit)
@@ -161,7 +164,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             var remaining = 60
             while (remaining > 0) {
-                kotlinx.coroutines.delay(1000)
+                delay(1000)
                 remaining--
                 _codeState.value = _codeState.value.copy(cooldown = remaining)
             }
@@ -222,7 +225,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private suspend fun handleLoginResult(
-        result: cn.szu.blankxiao.panoramaview.api.common.Result<cn.szu.blankxiao.panoramaview.api.auth.dto.LoginResponseDto?>,
+        result: cn.szu.blankxiao.panoramaview.api.common.Result<LoginResponseDto?>,
         email: String
     ) {
         if ((result.success == true || result.code == 200) && result.data != null) {

@@ -1,4 +1,4 @@
-package cn.szu.blankxiao.panoramaview.ui.task
+package cn.szu.blankxiao.panoramaview.ui.resources
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.szu.blankxiao.panoramaview.R
+import cn.szu.blankxiao.panoramaview.ui.task.TaskAdapter
 import cn.szu.blankxiao.panoramaview.viewmodel.PanoramaViewModel
 import kotlinx.coroutines.launch
 
@@ -24,7 +25,7 @@ class TasksSubFragment : Fragment() {
     private val vm: PanoramaViewModel by activityViewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+		inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.fragment_tasks_sub, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,8 +39,12 @@ class TasksSubFragment : Fragment() {
         val layoutEmpty = view.findViewById<LinearLayout>(R.id.layout_tasks_empty)
 
         val adapter = TaskAdapter { task ->
-            Toast.makeText(requireContext(), "任务 #${task.id}: ${TaskAdapter.mapStatus(task.status)}", Toast.LENGTH_SHORT).show()
-        }
+			Toast.makeText(
+				requireContext(),
+				"任务 #${task.id}: ${TaskAdapter.Companion.mapStatus(task.status)}",
+				Toast.LENGTH_SHORT
+			).show()
+		}
         rvTasks.adapter = adapter
 
         swipeRefresh.setOnRefreshListener { vm.loadTaskList() }

@@ -6,6 +6,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.opengl.Matrix
+import cn.szu.blankxiao.panorama.controller.AngleOfViewController
+import cn.szu.blankxiao.panorama.controller.internal.LifecycleController
+import cn.szu.blankxiao.panorama.controller.internal.RotationController
 
 /**
  * 基于陀螺仪（TYPE_ROTATION_VECTOR）的朝向提供者
@@ -13,26 +16,25 @@ import android.opengl.Matrix
  *
  * @author BlankXiao
  */
-class GyroOrientationProvider(private val context: Context) : OrientationProvider, SensorEventListener {
+class GyroOrientationProvider(
+	context: Context
+) : OrientationProvider, LifecycleController, SensorEventListener, AngleOfViewController {
 
-	private var rotationMatrix = floatArrayOf(
-		1f, 0f, 0f, 0f,
-		0f, 1f, 0f, 0f,
-		0f, 0f, 1f, 0f,
-		0f, 0f, 0f, 1f
-	)
+	// 旋转矩阵 对应姿势
+	private var rotationMatrix = FloatArray(16)
 
+	// 偏移矩阵
 	private var biasMatrix = FloatArray(16)
 
 	private val sensorManager: SensorManager =
 		context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-	private val sensor: Sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!!
+	private val sensor: Sensor = requireNotNull(
+		sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+	) { "TYPE_ROTATION_VECTOR sensor is not available on this device" }
 
 	private var isFirstFrame = true
 	private var isGyroTrackingEnabled = true
-	private var rotVecValues: FloatArray? = null
-	private val rotationQuaternion = FloatArray(4)
 
 	override fun getRotationMatrix(): FloatArray = rotationMatrix
 	override fun getBiasMatrix(): FloatArray = biasMatrix
@@ -61,39 +63,31 @@ class GyroOrientationProvider(private val context: Context) : OrientationProvide
 
 	override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
+	/**
+	 * 处理陀螺仪的关键函数
+	 */
 	override fun onSensorChanged(event: SensorEvent?) {
 		if (event?.sensor?.type != Sensor.TYPE_ROTATION_VECTOR) return
+		val rotationVectorValues = event.values.copyOf()
 
 		if (isFirstFrame) {
 			isFirstFrame = false
-			val orientationMatrix = FloatArray(16)
-			Matrix.setIdentityM(orientationMatrix, 0)
-
-			if (rotVecValues == null) {
-				rotVecValues = FloatArray(event.values.size)
-			}
-			for (i in rotVecValues!!.indices) {
-				rotVecValues!![i] = event.values[i]
-			}
-
-			SensorManager.getQuaternionFromVector(rotationQuaternion, rotVecValues)
-			SensorManager.getRotationMatrixFromVector(orientationMatrix, rotVecValues)
-			rotationMatrix = orientationMatrix
-
-			val invertMatrix = FloatArray(16)
-			Matrix.invertM(invertMatrix, 0, orientationMatrix, 0)
-			biasMatrix = invertMatrix
+			initRelateMatrix(rotationVectorValues)
 			return
 		}
 
-		if (isGyroTrackingEnabled) {
-			for (i in rotVecValues?.indices!!) {
-				rotVecValues?.set(i, event.values[i])
-			}
-			if (rotVecValues != null) {
-				SensorManager.getQuaternionFromVector(rotationQuaternion, rotVecValues)
-				SensorManager.getRotationMatrixFromVector(rotationMatrix, rotVecValues)
-			}
-		}
+		if (!isGyroTrackingEnabled) return
+		SensorManager.getRotationMatrixFromVector(rotationMatrix, rotationVectorValues)
+	}
+
+	private fun initRelateMatrix(rotationVectorValues: FloatArray) {
+		// 旋转变量转为旋转矩阵 输出到rotationVectorValues
+		val orientationMatrix = FloatArray(16)
+		SensorManager.getRotationMatrixFromVector(orientationMatrix, rotationVectorValues)
+		rotationMatrix = orientationMatrix
+		// 计算逆矩阵存入biasMatrix
+		val invertMatrix = FloatArray(16)
+		Matrix.invertM(invertMatrix, 0, orientationMatrix, 0)
+		biasMatrix = invertMatrix
 	}
 }

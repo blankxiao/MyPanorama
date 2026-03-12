@@ -22,12 +22,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val root = findViewById<android.view.View>(R.id.root_main)
+        // TODO ViewCompat是什么
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.updatePadding(top = bars.top, bottom = bars.bottom)
             insets
         }
 
+        // 绑定底部导航栏和Fragment
+        // menu的id与nav_graph的id对应
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController

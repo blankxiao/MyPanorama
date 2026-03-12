@@ -1,13 +1,14 @@
 package cn.szu.blankxiao.panorama.cg.render
 
 import android.graphics.Bitmap
+import cn.szu.blankxiao.panorama.controller.internal.LifecycleController
 
 /**
  * @author BlankXiao
  * @description GLTextureRenderer
  * @date 2025-10-26 22:15
  */
-interface GLTextureRenderer {
+interface GLTextureRenderer: LifecycleController {
 	/**
 	 * surface创建好
 	 */
@@ -22,10 +23,6 @@ interface GLTextureRenderer {
 	 * 绘制帧内容
 	 */
 	fun onDrawFrame()
-
-	fun onAttached()
-
-	fun onDetached()
 
 	fun loadBitmap(bitmap: Bitmap?)
 

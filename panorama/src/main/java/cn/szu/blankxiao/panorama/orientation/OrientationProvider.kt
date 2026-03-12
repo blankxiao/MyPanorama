@@ -25,23 +25,4 @@ interface OrientationProvider {
 	 */
 	fun setBiasMatrix(matrix: FloatArray)
 
-	/**
-	 * 回正：将当前旋转矩阵的逆设为 biasMatrix，使当前朝向变为“正面”
-	 */
-	fun reCenter()
-
-	/**
-	 * 是否启用陀螺仪跟踪
-	 */
-	fun setGyroTrackingEnabled(enabled: Boolean)
-
-	/**
-	 * 与 View 生命周期绑定：注册传感器监听
-	 */
-	fun onAttached()
-
-	/**
-	 * 与 View 生命周期绑定：注销传感器监听
-	 */
-	fun onDetached()
 }

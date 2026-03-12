@@ -51,18 +51,6 @@ class Camera(val screenRatio: Float) {
 	}
 
 	/**
-	 * 旋转角度和方向轴
-	 */
-	fun rotate(angle: Float, axis: Axis) {
-		when (axis) {
-			Axis.AXIS_X -> Matrix.rotateM(viewMatrix, 0, angle, 1.0f, 0.0f, 0.0f)
-			Axis.AXIS_Y -> Matrix.rotateM(viewMatrix, 0, angle, 0.0f, 1.0f, 0.0f)
-			Axis.AXIS_Z -> Matrix.rotateM(viewMatrix, 0, angle, 0.0f, 0.0f, 1.0f)
-			else -> throw RuntimeException()
-		}
-	}
-
-	/**
 	 * 视图矩阵重设为单位矩阵
 	 */
 	fun rebuildViewMatrix() {

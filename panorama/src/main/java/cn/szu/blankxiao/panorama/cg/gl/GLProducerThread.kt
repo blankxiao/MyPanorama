@@ -77,10 +77,10 @@ class GLProducerThread(
 			// 先执行事件队列中没完成的任务
 			eventHandler.dequeueEventAndRun()
 
-			// 渲染
+			// 渲染新的纹理到缓存 然后和正在展示的缓存交换
 			textureRenderer.onDrawFrame()
 
-			// TODO 缓存处理？
+			// 交换缓存 刷新页面
 			curEGLHelper.swapBuffers()
 
 			if (isPaused) {

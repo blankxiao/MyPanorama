@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.opengl.GLES20
 import cn.szu.blankxiao.panorama.R
-import cn.szu.blankxiao.panorama.orientation.GyroOrientationProvider
 import cn.szu.blankxiao.panorama.cg.camera.Camera
 import cn.szu.blankxiao.panorama.cg.mesh.MeshType
 import cn.szu.blankxiao.panorama.cg.mesh.PanoramaMesh.Companion.COORDINATES_PER_COLOR
@@ -13,9 +12,12 @@ import cn.szu.blankxiao.panorama.cg.mesh.PanoramaMesh.Companion.COORDINATES_PER_
 import cn.szu.blankxiao.panorama.cg.render.GLTextureRenderer
 import cn.szu.blankxiao.panorama.cg.render.Shader
 import cn.szu.blankxiao.panorama.cg.render.Texture
+import cn.szu.blankxiao.panorama.controller.AngleOfViewController
+import cn.szu.blankxiao.panorama.controller.CameraController
+import cn.szu.blankxiao.panorama.controller.internal.LifecycleController
 import cn.szu.blankxiao.panorama.renderer.mesher.PanoramaMesher
-import cn.szu.blankxiao.panorama.renderer.rotation.DefaultRotationController
-import cn.szu.blankxiao.panorama.renderer.rotation.RotationController
+import cn.szu.blankxiao.panorama.controller.internal.RotationController
+import cn.szu.blankxiao.panorama.controller.internal.TouchRotationController
 import cn.szu.blankxiao.panorama.utils.OpenGLUtil
 
 /**
@@ -25,9 +27,20 @@ import cn.szu.blankxiao.panorama.utils.OpenGLUtil
  *
  * @author BlankXiao
  */
-class Renderer(private val context: Context) : GLTextureRenderer, UserInteractionRenderDriver, TextureUpdateRenderDriver {
+class Renderer(
+	private val context: Context,
+	private val rotationController: RotationController
+) : GLTextureRenderer,
+	CameraController,
+	TextureUpdateRenderDriver,
+	AngleOfViewController by rotationController,
+	LifecycleController by rotationController,
+	TouchRotationController by rotationController
+{
 
 	// 渲染目标
+	// TextureView 作为openGL渲染内容的显示载体 是当前Frame布局的唯一子view
+	// 内部使用了SurfaceTexture 是opengl的直接渲染目标
 	private lateinit var texture: Texture
 
 	/**
@@ -37,12 +50,12 @@ class Renderer(private val context: Context) : GLTextureRenderer, UserInteractio
 	private var fragmentShaderHandle = 0
 	private var programHandle = 0
 
+	// 相机
 	private lateinit var camera: Camera
 
-	/**
-	 * 着色器
-	 */
+	// 顶点着色器
 	private var vertexShader = Shader()
+	// 片段着色器
 	private var fragmentShader: Shader = Shader()
 
 	/**
@@ -50,15 +63,6 @@ class Renderer(private val context: Context) : GLTextureRenderer, UserInteractio
 	 */
 	private var mesher: PanoramaMesher = PanoramaMesher.create(MeshType.SPHERE)
 	private var currentMeshType: MeshType = MeshType.SPHERE
-
-	/**
-	 * 朝向提供者（陀螺仪 → 旋转矩阵 / 偏移矩阵）
-	 */
-	private val rotationController: RotationController =
-		DefaultRotationController(GyroOrientationProvider(context))
-
-	// 触摸灵敏度（默认值，可通过接口调整）
-	private var touchSensitivity: Float = 0.5f
 
 	override fun onGLContextAvailable() {
 		// 注册绑定纹理
@@ -77,16 +81,10 @@ class Renderer(private val context: Context) : GLTextureRenderer, UserInteractio
 
 	override fun onDrawFrame() {
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-		rotationController.updateCameraView(camera, mesher)
+		// 重建相机朝向
+		rotationController.updateCameraView(camera)
+		// 刷新页面
 		renderMesh()
-	}
-
-	override fun onAttached() {
-		rotationController.onAttached()
-	}
-
-	override fun onDetached() {
-		rotationController.onDetached()
 	}
 
 	override fun loadBitmap(bitmap: Bitmap?) {
@@ -98,41 +96,6 @@ class Renderer(private val context: Context) : GLTextureRenderer, UserInteractio
 		texture.create()
 		renderMesh()
 		texture.loadBitmapToGLTexture(bitmap)
-	}
-
-
-	fun reCenter() {
-		rotationController.reCenter()
-	}
-
-	fun enableGyroTracking(enabled: Boolean) {
-		rotationController.setGyroTrackingEnabled(enabled)
-	}
-
-	/**
-	 * 开始触摸旋转
-	 * 委托给 mesher 保存当前状态
-	 */
-	override fun startTouchRotation() {
-		rotationController.startTouchRotation(mesher)
-	}
-
-	/**
-	 * 应用触摸旋转增量
-	 * 委托给 mesher 处理
-	 * @param deltaX 水平移动距离（像素）
-	 * @param deltaY 垂直移动距离（像素）
-	 */
-	override fun applyTouchRotation(deltaX: Float, deltaY: Float) {
-		rotationController.applyTouchRotation(mesher, deltaX, deltaY, touchSensitivity)
-	}
-
-	/**
-	 * 结束触摸旋转
-	 * 委托给 mesher 将触摸旋转合并到 biasMatrix
-	 */
-	override fun endTouchRotation() {
-		rotationController.endTouchRotation(mesher)
 	}
 
 	/**
@@ -152,11 +115,7 @@ class Renderer(private val context: Context) : GLTextureRenderer, UserInteractio
 	 */
 	fun getMeshType(): MeshType = currentMeshType
 
-	fun setTouchSensitivity(sensitivity: Float) {
-		touchSensitivity = sensitivity
-	}
-
-	fun getTouchSensitivity(): Float = touchSensitivity
+	internal fun getMesher(): PanoramaMesher = mesher
 
 	/**
 	 * 设置 FOV（视场角）
@@ -173,10 +132,17 @@ class Renderer(private val context: Context) : GLTextureRenderer, UserInteractio
 	 */
 	override fun getFov(): Float = if (::camera.isInitialized) camera.currentFov else Camera.DEFAULT_FOV
 
+	/**
+	 * 绑定gl的各个属性
+	 */
 	private fun renderMesh() {
+		// 激活当前的shader program
 		GLES20.glUseProgram(programHandle)
+		// 绑定顶点属性
 		bindMeshAttributes()
+		// 绑定纹理属性
 		bindTextureSampler()
+		// 绑定mvp矩阵
 		bindMvpMatrix()
 		drawMesh()
 		vertexShader.disableAllAttrbHandle()
@@ -235,7 +201,7 @@ class Renderer(private val context: Context) : GLTextureRenderer, UserInteractio
 		)
 		programHandle = OpenGLUtil.createAndLinkProgram(
 			vertexShaderHandle, fragmentShaderHandle,
-			arrayOf("a_Position", "a_Color", "a_TexCoordinate")
+			arrayOf("a_Position", "a_Color", "a_TextureCoordinates")
 		)
 	}
 }

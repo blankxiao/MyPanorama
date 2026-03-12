@@ -3,20 +3,21 @@ package cn.szu.blankxiao.panorama
 import android.app.ActivityManager
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.TextureView
 import android.widget.FrameLayout
-import cn.szu.blankxiao.panorama.api.PanoramaController
+import cn.szu.blankxiao.panorama.controller.PanoramaController
 import cn.szu.blankxiao.panorama.cg.camera.Camera
 import cn.szu.blankxiao.panorama.cg.mesh.MeshType
 import cn.szu.blankxiao.panorama.helper.PanoramaImageLoader
 import cn.szu.blankxiao.panorama.helper.PanoramaGestureController
+import cn.szu.blankxiao.panorama.helper.PanoramaSurfaceTextureCoordinator
+import cn.szu.blankxiao.panorama.orientation.GyroOrientationProvider
 import cn.szu.blankxiao.panorama.renderer.Renderer
 import cn.szu.blankxiao.panorama.renderer.RenderSession
 import cn.szu.blankxiao.panorama.renderer.TextureUpdateRenderDriver
-import cn.szu.blankxiao.panorama.renderer.UserInteractionRenderDriver
+import cn.szu.blankxiao.panorama.renderer.rotation.DefaultRotationController
 
 /**
  * @author BlankXiao
@@ -27,56 +28,68 @@ class PanoramaView(
 	context: Context,
 	attrs: AttributeSet?
 ) : FrameLayout(context, attrs),
-	TextureView.SurfaceTextureListener,
 	PanoramaController {
 
-	// TextureView 作为openGL渲染内容的显示载体 是当前Frame布局的唯一子view
-	// 内部使用了SurfaceTexture 是opengl的直接渲染目标
-	private lateinit var renderView: TextureView
 
 	// 渲染器
-	private lateinit var renderer: Renderer
-	private lateinit var interactionDriver: UserInteractionRenderDriver
-	private lateinit var textureDriver: TextureUpdateRenderDriver
+	private var renderer: Renderer
 
-	// 渲染线程 继承Thread
-	private lateinit var renderSession: RenderSession
+	// 封装渲染线程的逻辑
+	private var renderSession: RenderSession
 
+	// 手势控制
 	private val gestureController: PanoramaGestureController
+	// 纹理资源
 	private val imageLoader: PanoramaImageLoader
+	private val surfaceTextureCoordinator: PanoramaSurfaceTextureCoordinator
 
 	init {
+		// 环境校验 判断是否支持GLES 2.0
 		val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 		val configurationInfo = activityManager.deviceConfigurationInfo
 		val supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000
 		if (!supportsEs2) {
 			throw RuntimeException("your device does not support opengles 2.0")
 		}
-		renderView = TextureView(context).apply {
-			surfaceTextureListener = this@PanoramaView
-			setOnTouchListener { _, _ -> false }
-		}
-		addView(renderView)
-		renderer = Renderer(context)
-		interactionDriver = renderer
-		textureDriver = renderer
-		renderSession = RenderSession(renderer)
 
+		// 陀螺仪服务
+		val gyroProvider = GyroOrientationProvider(context)
+		// 视角控制
+		val rotationController = DefaultRotationController(
+			orientationProvider = gyroProvider,
+			angleOfViewController = gyroProvider,
+			lifecycleController = gyroProvider,
+			mesherProvider = { renderer.getMesher() }
+		)
+		// 全景图渲染核心
+		renderer = Renderer(context, rotationController)
+		renderSession = RenderSession(renderer)
+		// 手势业务逻辑
 		gestureController = PanoramaGestureController(
 			context = context,
-			renderDriver = interactionDriver,
+			cameraController = renderer,
+			touchRotationController = renderer,
 			enqueueToGl = { task -> renderSession.post(task) },
 			isRenderReady = { renderSession.isReady() },
 			onFovChanged = { newFov -> onFovChangedListener?.invoke(newFov) },
 			onDoubleTap = { onDoubleTapListener?.invoke() }
 		)
-
+		// 纹理资源加载
 		imageLoader = PanoramaImageLoader(
 			context = context,
-			renderDriver = textureDriver,
+			renderDriver = renderer,
 			enqueueToGl = { task -> renderSession.post(task) },
 			isRenderReady = { renderSession.isReady() }
 		)
+		surfaceTextureCoordinator = PanoramaSurfaceTextureCoordinator(renderSession, imageLoader)
+
+		// 渲染的目标view
+		val renderView = TextureView(context).apply {
+			surfaceTextureListener = surfaceTextureCoordinator
+			// 不拦截点击事件
+			setOnTouchListener { _, _ -> false }
+		}
+		addView(renderView)
 	}
 
 	/**
@@ -85,7 +98,7 @@ class PanoramaView(
 	 * @param enabled
 	 */
 	override fun setGyroTrackingEnabled(enabled: Boolean) {
-		renderer.enableGyroTracking(enabled)
+		renderer.setGyroTrackingEnabled(enabled)
 	}
 
 	/**
@@ -162,12 +175,12 @@ class PanoramaView(
 	override fun getFov(): Float = renderer.getFov()
 
 	/**
-	 * FOV 变化回调（捏合缩放或 setFov 时触发）
+	 * FOV 变化回调
 	 */
 	override var onFovChangedListener: ((Float) -> Unit)? = null
 
 	/**
-	 * 双击回调（用于全屏切换等）
+	 * 双击回调
 	 */
 	override var onDoubleTapListener: (() -> Unit)? = null
 
@@ -176,7 +189,6 @@ class PanoramaView(
 	 */
 	override fun onAttachedToWindow() {
 		super.onAttachedToWindow()
-		// 添加渲染器
 		renderer.onAttached()
 	}
 
@@ -185,36 +197,6 @@ class PanoramaView(
 		renderer.onDetached()
 		// 释放 EGL 上下文资源
 		renderSession.release()
-	}
-
-
-	// -------------------------------
-	// 对listener接口的实现
-	// -------------------------------
-	// detached 以后再 attached 还会回调此方法
-	override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-		// 确保从后台回来的时候只调用一次，只初始化一条 GLProducerThread
-		if (!renderSession.isReady()) {
-			renderSession.init(surface, width, height) {
-				imageLoader.loadForFirstSurface()
-			}
-		} else {
-			renderSession.resume(surface) {
-				imageLoader.reloadForExistingSurface()
-			}
-		}
-	}
-
-	override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-		renderSession.resize(width, height)
-	}
-
-	override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-		renderSession.pause()
-		return true
-	}
-
-	override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
 	}
 
 	/**
@@ -226,11 +208,12 @@ class PanoramaView(
 	}
 
 	/**
-	 * 拦截触摸事件，确保触摸事件被正确处理
+	 * 拦截触摸事件，由本 View 统一处理。
+	 * 子 View（TextureView）不处理触摸，所有手势由 PanoramaView.onTouchEvent 处理，
+	 * 直接拦截可避免先分发给子 View 再回传的无效分发。
 	 */
 	override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-		// 允许触摸事件传递给 onTouchEvent
-		return false
+		return true
 	}
 
 }

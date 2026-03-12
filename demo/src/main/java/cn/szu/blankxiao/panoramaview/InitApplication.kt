@@ -12,7 +12,7 @@ class InitApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Firebase 初始化（无单独配置文件，就这一段代码 + google-services.json）
+        // Firebase 初始化
         FirebaseApp.initializeApp(this)
         FirebaseCrashlytics.getInstance().setCustomKey("build_type", if (BuildConfig.DEBUG) "debug" else "release")
 

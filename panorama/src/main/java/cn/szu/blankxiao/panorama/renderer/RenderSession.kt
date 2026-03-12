@@ -2,6 +2,7 @@ package cn.szu.blankxiao.panorama.renderer
 
 import android.graphics.SurfaceTexture
 import cn.szu.blankxiao.panorama.cg.gl.GLProducerThread
+import cn.szu.blankxiao.panorama.cg.render.GLTextureRenderer
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -11,8 +12,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * 设为 internal：仅限 panorama module 内使用。
  */
-internal class RenderSession(private val renderer: Renderer) {
+internal class RenderSession(private val renderer: GLTextureRenderer) {
 	private var initialized = false
+	// 渲染线程 继承Thread
+	// 初始化GL环境
 	private lateinit var producerThread: GLProducerThread
 
 	fun isReady(): Boolean = initialized
