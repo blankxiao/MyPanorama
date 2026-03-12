@@ -3,6 +3,9 @@ package cn.szu.blankxiao.panorama.renderer.mesher.cylinder
 import android.opengl.Matrix
 import cn.szu.blankxiao.panorama.cg.camera.Camera
 import cn.szu.blankxiao.panorama.renderer.mesher.PanoramaRotationStrategy
+import java.lang.Math.toDegrees
+import kotlin.math.abs
+import kotlin.math.atan2
 
 /**
  * 圆柱体旋转策略
@@ -32,7 +35,7 @@ class CylinderRotationStrategy : PanoramaRotationStrategy {
 
 	override fun applyTouchRotation(camera: Camera) {
 		// 圆柱体模式：从基准 yaw 矩阵应用触摸增量
-		if (Math.abs(touchYawDelta) > 0.01f) {
+		if (abs(touchYawDelta) > 0.01f) {
 			val deltaYawMatrix = FloatArray(16)
 			Matrix.setIdentityM(deltaYawMatrix, 0)
 			Matrix.rotateM(deltaYawMatrix, 0, touchYawDelta, 0f, 1f, 0f)
@@ -48,10 +51,7 @@ class CylinderRotationStrategy : PanoramaRotationStrategy {
 		val combinedMatrix = FloatArray(16)
 		Matrix.multiplyMM(combinedMatrix, 0, rotationMatrix, 0, biasMatrix, 0)
 		touchBaseYawMatrix = extractYawRotation(combinedMatrix)
-		// 保存传感器坐标系中的 yaw 角度（度），供 onTouchEnd 使用
-		touchBaseYawAngle = Math.toDegrees(
-			Math.atan2(combinedMatrix[1].toDouble(), combinedMatrix[0].toDouble())
-		).toFloat()
+		touchBaseYawAngle = extractYawDegrees(combinedMatrix)
 		touchYawDelta = 0f
 	}
 
@@ -88,15 +88,28 @@ class CylinderRotationStrategy : PanoramaRotationStrategy {
 	}
 
 	/**
-	 * 从旋转矩阵中提取仅包含 yaw（绕 Y 轴旋转）的矩阵
+	 * 从当前渲染链路使用的旋转矩阵中提取 yaw（弧度）。
+	 *
+	 * 这里不能直接套用 getOrientation 的下标定义。项目中 rotationMatrix 来自
+	 * SensorManager.getRotationMatrixFromVector，而后直接参与 OpenGL 的 multiplyMM。
+	 * 实测在这条链路下，水平环绕角应使用 m[1]/m[0] 这组分量提取；否则会出现只能小幅摆动。
+	 */
+	private fun extractYawRadians(inputMatrix: FloatArray): Double {
+		return atan2(inputMatrix[1].toDouble(), inputMatrix[0].toDouble())
+	}
+
+	private fun extractYawDegrees(inputMatrix: FloatArray): Float {
+		return toDegrees(extractYawRadians(inputMatrix)).toFloat()
+	}
+
+	/**
+	 * 从旋转矩阵中提取仅包含 yaw（绕 OpenGL Y 轴旋转）的矩阵
 	 */
 	private fun extractYawRotation(inputMatrix: FloatArray): FloatArray {
-		val yaw = Math.atan2(inputMatrix[1].toDouble(), inputMatrix[0].toDouble())
-
+		val yawDeg = extractYawDegrees(inputMatrix)
 		val result = FloatArray(16)
 		Matrix.setIdentityM(result, 0)
-		Matrix.rotateM(result, 0, Math.toDegrees(yaw).toFloat(), 0f, 1f, 0f)
-
+		Matrix.rotateM(result, 0, yawDeg, 0f, 1f, 0f)
 		return result
 	}
 }
