@@ -72,8 +72,14 @@ dependencies {
 	implementation("com.google.firebase:firebase-crashlytics")
 	implementation("com.google.firebase:firebase-analytics")
 
+	// 卡顿检测：JankStats（每帧回调，可打日志/写报告）
+	implementation(libs.androidx.metrics.performance)
+
 	testImplementation(libs.junit)
 	testImplementation(libs.kotlinx.coroutines.android)
 	androidTestImplementation(libs.androidx.junit)
 	androidTestImplementation(libs.androidx.espresso.core)
+
+	// 内存泄漏检测：仅 debug 构建，自动安装，无需代码
+	debugImplementation(libs.leakcanary.android)
 }

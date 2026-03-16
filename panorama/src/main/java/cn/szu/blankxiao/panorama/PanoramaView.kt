@@ -62,7 +62,7 @@ class PanoramaView(
 			mesherProvider = { renderer.getMesher() }
 		)
 		// 全景图渲染核心
-		renderer = Renderer(context, rotationController)
+		renderer = Renderer(context.applicationContext, rotationController)
 		renderSession = RenderSession(renderer)
 		// 手势业务逻辑
 		gestureController = PanoramaGestureController(

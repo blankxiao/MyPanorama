@@ -10,3 +10,4 @@
 local.properties
 /outputs/
 /docs/*.md
+.kotlin/
