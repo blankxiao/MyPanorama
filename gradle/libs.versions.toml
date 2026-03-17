@@ -24,6 +24,8 @@ swiperefreshlayout = "1.1.0"
 # 内存泄漏 / 卡顿检测（仅 debug 或通用）
 leakcanary = "2.14"
 metrics-performance = "1.0.0"
+# 图片加载
+coil = "2.7.0"
 
 
 [libraries]
@@ -56,6 +58,8 @@ androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "s
 # 内存泄漏 / 卡顿检测
 leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 androidx-metrics-performance = { group = "androidx.metrics", name = "metrics-performance", version.ref = "metrics-performance" }
+# 图片加载
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 
 
 [plugins]

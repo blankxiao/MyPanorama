@@ -75,6 +75,9 @@ dependencies {
 	// 卡顿检测：JankStats（每帧回调，可打日志/写报告）
 	implementation(libs.androidx.metrics.performance)
 
+	// 图片加载：Coil
+	implementation(libs.coil)
+
 	testImplementation(libs.junit)
 	testImplementation(libs.kotlinx.coroutines.android)
 	androidTestImplementation(libs.androidx.junit)

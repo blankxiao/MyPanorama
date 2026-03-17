@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- 缩略图占位（后续可替换为真实图片） -->
+        <!-- 缩略图：绑定 resultOssUrl（由适配器加载 Bitmap） -->
         <FrameLayout
             android:id="@+id/gallery_thumbnail_placeholder"
             android:layout_width="match_parent"
@@ -20,13 +20,12 @@
             android:background="@drawable/bg_thumbnail_placeholder">
 
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:id="@+id/iv_gallery_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_nav_panorama"
                 android:contentDescription="@null"
-                app:tint="?attr/colorOnSurfaceVariant"
-                android:alpha="0.6" />
+                android:scaleType="centerCrop" />
         </FrameLayout>
 
         <LinearLayout
@@ -35,38 +34,38 @@
             android:orientation="vertical"
             android:padding="@dimen/card_padding">
 
-        <TextView
-            android:id="@+id/tv_gallery_name"
-            style="@style/Widget.PanoramaView.Text.ListTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:ellipsize="end" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_small"
-            android:orientation="horizontal">
-
             <TextView
-                android:id="@+id/tv_gallery_mode"
-                style="@style/Widget.PanoramaView.Text.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:id="@+id/tv_gallery_name"
+                style="@style/Widget.PanoramaView.Text.ListTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_small"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tv_gallery_time"
-                style="@style/Widget.PanoramaView.Text.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/tv_gallery_mode"
+                    style="@style/Widget.PanoramaView.Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
-        </LinearLayout>
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tv_gallery_time"
+                    style="@style/Widget.PanoramaView.Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>
