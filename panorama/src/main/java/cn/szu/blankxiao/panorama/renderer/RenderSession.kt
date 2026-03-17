@@ -47,9 +47,12 @@ internal class RenderSession(private val renderer: GLTextureRenderer) {
 
 	fun release() {
 		if (initialized) {
+			// 请求线程退出渲染循环并在 GL 线程中释放 EGL 资源。
 			post {
 				producerThread.releaseEglContext()
+				producerThread.stopRender()
 			}
+			initialized = false
 		}
 	}
 

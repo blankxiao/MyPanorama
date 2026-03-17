@@ -58,6 +58,16 @@ class GLProducerThread(
 		}
 	}
 
+	/**
+	 * 请求线程安全退出渲染循环。
+	 * 会将 shouldRender 置为 false，并唤醒可能在 wait 中的循环。
+	 */
+	fun stopRender() {
+		shouldRender.set(false)
+		// 确保如果当前在暂停等待中可以被唤醒并尽快退出
+		requestRender()
+	}
+
 	fun releaseEglContext() {
 		curEGLHelper.releaseEGLContext()
 	}

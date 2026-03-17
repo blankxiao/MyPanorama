@@ -52,17 +52,24 @@ class PanoramaView(
 			throw RuntimeException("your device does not support opengles 2.0")
 		}
 
-		// 陀螺仪服务
-		val gyroProvider = GyroOrientationProvider(context)
+		val appContext = context.applicationContext
+
+		// 陀螺仪服务（用 applicationContext 避免被 GL 线程链持有 Activity，SensorManager 从 Application 获取即可）
+		val gyroProvider = GyroOrientationProvider(appContext)
+
+		// 为了避免 lambda 捕获到 PanoramaView(this)，这里使用局部变量引用 Renderer，
+		// 让 DefaultRotationController 持有的是局部 renderer，而不是外部 View。
+		lateinit var localRenderer: Renderer
 		// 视角控制
 		val rotationController = DefaultRotationController(
 			orientationProvider = gyroProvider,
 			angleOfViewController = gyroProvider,
 			lifecycleController = gyroProvider,
-			mesherProvider = { renderer.getMesher() }
+			mesherProvider = { localRenderer.getMesher() }
 		)
 		// 全景图渲染核心
-		renderer = Renderer(context.applicationContext, rotationController)
+		localRenderer = Renderer(appContext, rotationController)
+		renderer = localRenderer
 		renderSession = RenderSession(renderer)
 		// 手势业务逻辑
 		gestureController = PanoramaGestureController(
