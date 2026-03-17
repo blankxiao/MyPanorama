@@ -29,6 +29,15 @@ android {
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 	}
 
+	signingConfigs {
+		create("release") {
+			storeFile = file("../mypanorama.keystore")
+			storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "123456"
+			keyAlias = System.getenv("KEY_ALIAS") ?: "release"
+			keyPassword = System.getenv("KEY_PASSWORD") ?: "123456"
+		}
+	}
+
 	buildTypes {
 		release {
 			// 代码压缩
@@ -39,6 +48,7 @@ android {
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
 			)
+			signingConfig = signingConfigs.getByName("release")
 		}
 	}
 	compileOptions {
@@ -69,6 +79,7 @@ dependencies {
 	implementation(libs.okhttp.logging)
 	implementation(libs.moshi)
 	implementation(libs.moshi.kotlin)
+	implementation(libs.kotlin.reflect) // Moshi 反射必需
 	implementation(libs.kotlinx.coroutines.android)
 	implementation(libs.androidx.lifecycle.viewmodel.ktx)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
