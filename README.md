@@ -15,7 +15,7 @@
 | 模块 | 技术 |
 |------|------|
 | 全景库 (panorama) | Kotlin、OpenGL ES |
-| 示例 App (demo) | Fragment + Navigation + ViewPager2、ViewModel + StateFlow/SharedFlow、Retrofit + Moshi、OkHttp WebSocket、DataStore |
+| 示例 App (demo) | Fragment + Navigation + ViewPager2、ViewModel + StateFlow/SharedFlow、Retrofit + Moshi、OkHttp WebSocket、DataStore、Coil（图片加载）|
 
 ---
 

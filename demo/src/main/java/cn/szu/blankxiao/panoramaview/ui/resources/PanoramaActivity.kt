@@ -64,7 +64,7 @@ class PanoramaActivity : AppCompatActivity() {
         if (!url.isNullOrBlank()) {
             panoramaView.setBitmapUrl(url)
         } else {
-            val bitmap = BitmapFactory.decodeResource(resources, R.drawable.pano)
+            val bitmap = BitmapFactory.decodeResource(resources, R.drawable.pano_cylinder)
             panoramaView.setBitmap(bitmap)
         }
         panoramaView.setGyroTrackingEnabled(true)

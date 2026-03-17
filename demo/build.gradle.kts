@@ -14,6 +14,12 @@ android {
 	}
 
 	defaultConfig {
+		// 精简语言
+		resConfigs("zh", "en")
+        // 精简 ABI：主流手机都是 arm64
+        ndk {
+            abiFilters += listOf("arm64-v8a")
+        }
 		applicationId = "cn.szu.blankxiao.panoramaview"
 		minSdk = 24
 		targetSdk = 36
@@ -25,7 +31,10 @@ android {
 
 	buildTypes {
 		release {
-			isMinifyEnabled = false
+			// 代码压缩
+			isMinifyEnabled = true
+			// 资源压缩
+			isShrinkResources = true
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
