@@ -58,6 +58,9 @@ class GallerySubFragment : Fragment() {
 
         swipeRefresh.setOnRefreshListener { vm.loadResultList() }
 
+        // 因为Fragment的view和本身的生命周期不一致 view在销毁后Fragment可能仍然存在
+        // 使用this更新ui可能导致崩溃
+        // 使用viewLifecycleOwner可以解决隐患
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.toastMessage.collect { msg ->

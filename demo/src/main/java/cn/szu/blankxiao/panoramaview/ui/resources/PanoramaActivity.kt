@@ -1,11 +1,14 @@
 package cn.szu.blankxiao.panoramaview.ui.resources
 
+import android.graphics.Color
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -31,6 +34,7 @@ class PanoramaActivity : AppCompatActivity() {
     }
 
     private lateinit var panoramaView: PanoramaView
+    private lateinit var panoramaRoot: View
     private lateinit var infoContainer: View
     private lateinit var tvFov: TextView
     private lateinit var tvSensitivity: TextView
@@ -45,10 +49,27 @@ class PanoramaActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_panorama)
 
+        // 非全屏：状态栏可见且有背景色
+        applyStatusBarForNonFullscreen()
+
         insetsController = WindowInsetsControllerCompat(window, window.decorView)
 
+        panoramaRoot = findViewById(R.id.panorama_root)
         panoramaView = findViewById(R.id.panorama)
         infoContainer = findViewById(R.id.info_container)
+
+        // 非全屏时根据系统栏 insets 添加 padding，避免内容被状态栏遮挡
+        ViewCompat.setOnApplyWindowInsetsListener(panoramaRoot) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                if (isFullscreen) 0 else bars.left,
+                if (isFullscreen) 0 else bars.top,
+                if (isFullscreen) 0 else bars.right,
+                if (isFullscreen) 0 else bars.bottom
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(panoramaRoot)
         tvFov = findViewById(R.id.tv_fov)
         tvSensitivity = findViewById(R.id.tv_touch_sensitivity)
         btnGyro = findViewById(R.id.btn_gyro_controller)
@@ -137,19 +158,27 @@ class PanoramaActivity : AppCompatActivity() {
         isFullscreen = !isFullscreen
         if (isFullscreen) {
             infoContainer.visibility = View.GONE
-            findViewById<View>(R.id.panorama_root).setBackgroundColor(
-                android.graphics.Color.BLACK
-            )
+            panoramaRoot.setBackgroundColor(Color.BLACK)
+            // 全屏：状态栏/导航栏透明，内容延伸至边缘，无背景条
+            window.statusBarColor = Color.TRANSPARENT
+            window.navigationBarColor = Color.TRANSPARENT
+            panoramaRoot.setPadding(0, 0, 0, 0)
             insetsController.hide(WindowInsetsCompat.Type.systemBars())
             insetsController.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         } else {
             infoContainer.visibility = View.VISIBLE
-            findViewById<View>(R.id.panorama_root).setBackgroundColor(
-                android.graphics.Color.BLACK
-            )
+            panoramaRoot.setBackgroundColor(Color.BLACK)
+            applyStatusBarForNonFullscreen()
             insetsController.show(WindowInsetsCompat.Type.systemBars())
+            ViewCompat.requestApplyInsets(panoramaRoot)
         }
+    }
+
+    /** 非全屏：状态栏有背景色，与主题一致 */
+    private fun applyStatusBarForNonFullscreen() {
+        window.statusBarColor = ContextCompat.getColor(this, R.color.primary_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.background)
     }
 
     @Deprecated("Deprecated in Java")

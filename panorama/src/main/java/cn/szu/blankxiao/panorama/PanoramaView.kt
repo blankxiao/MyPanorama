@@ -4,8 +4,10 @@ import android.app.ActivityManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.TextureView
+import android.view.View
 import android.widget.FrameLayout
 import cn.szu.blankxiao.panorama.controller.PanoramaController
 import cn.szu.blankxiao.panorama.cg.camera.Camera
@@ -18,6 +20,7 @@ import cn.szu.blankxiao.panorama.renderer.Renderer
 import cn.szu.blankxiao.panorama.renderer.RenderSession
 import cn.szu.blankxiao.panorama.renderer.TextureUpdateRenderDriver
 import cn.szu.blankxiao.panorama.renderer.rotation.DefaultRotationController
+import cn.szu.blankxiao.panorama.view.CompassOverlay
 
 /**
  * @author BlankXiao
@@ -33,6 +36,9 @@ class PanoramaView(
 
 	// 渲染器
 	private var renderer: Renderer
+
+	// 指南针叠加层（仅柱体模式下显示，球体 yaw 含 pitch 投影易混乱）
+	private lateinit var compassOverlay: CompassOverlay
 
 	// 封装渲染线程的逻辑
 	private var renderSession: RenderSession
@@ -67,8 +73,17 @@ class PanoramaView(
 			lifecycleController = gyroProvider,
 			mesherProvider = { localRenderer.getMesher() }
 		)
+		// 指南针叠加层（先创建，供 Renderer 回调更新；仅柱体模式显示）
+		compassOverlay = CompassOverlay(context).apply {
+			isClickable = false
+			isFocusable = false
+			visibility = View.GONE
+		}
 		// 全景图渲染核心
-		localRenderer = Renderer(appContext, rotationController)
+		localRenderer = Renderer(appContext, rotationController) { yaw ->
+			compassOverlay.yawDegrees = yaw
+			onYawChangedListener?.invoke(yaw)
+		}
 		renderer = localRenderer
 		renderSession = RenderSession(renderer)
 		// 手势业务逻辑
@@ -97,6 +112,14 @@ class PanoramaView(
 			setOnTouchListener { _, _ -> false }
 		}
 		addView(renderView)
+		addView(compassOverlay, FrameLayout.LayoutParams(
+			FrameLayout.LayoutParams.WRAP_CONTENT,
+			FrameLayout.LayoutParams.WRAP_CONTENT
+		).apply {
+			gravity = Gravity.TOP or Gravity.END
+			topMargin = 48
+			rightMargin = 24
+		})
 	}
 
 	/**
@@ -142,6 +165,7 @@ class PanoramaView(
 	 */
 	override fun setMeshType(meshType: MeshType) {
 		renderer.setMeshType(meshType)
+		compassOverlay.visibility = if (meshType == MeshType.CYLINDER) View.VISIBLE else View.GONE
 	}
 
 	/**
@@ -190,6 +214,11 @@ class PanoramaView(
 	 * 双击回调
 	 */
 	override var onDoubleTapListener: (() -> Unit)? = null
+
+	/**
+	 * yaw 变化回调（度），用于指南针等
+	 */
+	override var onYawChangedListener: ((Float) -> Unit)? = null
 
 	/**
 	 * 添加到窗口时调用

@@ -11,3 +11,7 @@ local.properties
 /outputs/
 /docs/*.md
 .kotlin/
+
+*.keystore
+*.jks
+keystore.base64

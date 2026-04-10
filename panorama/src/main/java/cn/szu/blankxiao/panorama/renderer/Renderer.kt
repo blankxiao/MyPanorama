@@ -3,6 +3,8 @@ package cn.szu.blankxiao.panorama.renderer
 import android.content.Context
 import android.graphics.Bitmap
 import android.opengl.GLES20
+import android.opengl.Matrix
+import kotlin.math.atan2
 import cn.szu.blankxiao.panorama.R
 import cn.szu.blankxiao.panorama.cg.camera.Camera
 import cn.szu.blankxiao.panorama.cg.mesh.MeshType
@@ -29,7 +31,8 @@ import cn.szu.blankxiao.panorama.utils.OpenGLUtil
  */
 class Renderer(
 	private val context: Context,
-	private val rotationController: RotationController
+	private val rotationController: RotationController,
+	private var onYawChanged: ((Float) -> Unit)? = null
 ) : GLTextureRenderer,
 	CameraController,
 	TextureUpdateRenderDriver,
@@ -64,6 +67,8 @@ class Renderer(
 	private var mesher: PanoramaMesher = PanoramaMesher.create(MeshType.SPHERE)
 	private var currentMeshType: MeshType = MeshType.SPHERE
 
+	private var frameCountForYaw = 0
+
 	override fun onGLContextAvailable() {
 		// 注册绑定纹理
 		texture = Texture()
@@ -85,6 +90,19 @@ class Renderer(
 		rotationController.updateCameraView(camera)
 		// 刷新页面
 		renderMesh()
+
+		// 指南针：每 4 帧提取一次 yaw，减少主线程压力
+		onYawChanged?.let { callback ->
+			if (++frameCountForYaw % 4 == 0) {
+				val v = camera.getViewMatrix()
+				// 从 view 矩阵提取相机朝向：第三行 (v[2],v[6],v[10]) 为 view -Z 在世界坐标的方向
+				val forwardX = v[2]
+				val forwardZ = v[10]
+				val yawRad = atan2(forwardX, forwardZ)
+				val yawDegrees = Math.toDegrees(yawRad.toDouble()).toFloat()
+				callback(yawDegrees)
+			}
+		}
 	}
 
 	override fun loadBitmap(bitmap: Bitmap?) {

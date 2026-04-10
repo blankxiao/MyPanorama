@@ -19,4 +19,7 @@ interface PanoramaController: AngleOfViewController, CameraController {
 
 	var onFovChangedListener: ((Float) -> Unit)?
 	var onDoubleTapListener: (() -> Unit)?
+
+	/** 当前 yaw 变化回调（度），0=北，90=东，顺时针为正；用于指南针等 */
+	var onYawChangedListener: ((Float) -> Unit)?
 }

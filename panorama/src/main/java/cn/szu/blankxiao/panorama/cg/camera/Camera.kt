@@ -62,6 +62,9 @@ class Camera(val screenRatio: Float) {
 		return mvpMatrix
 	}
 
+	/** 返回当前视图矩阵副本，供指南针等提取 yaw 使用 */
+	fun getViewMatrix(): FloatArray = viewMatrix.copyOf()
+
 	companion object {
 		private const val Z_NEAR = 0.1f
 		private const val Z_FAR = 100.0f
