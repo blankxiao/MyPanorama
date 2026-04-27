@@ -27,6 +27,17 @@
     <string name="create_hint_name">任务名称（可选）</string>
     <string name="create_hint_prompt">描述你想要的全景场景 *</string>
     <string name="create_hint_input_image">输入图 URL（outpaint 模式必填）</string>
+    <string name="create_hint_input_image_select">选择你上传的原图（outpaint 模式必选）</string>
+    <string name="create_btn_pick_upload_image">打开相册并上传</string>
+    <string name="create_btn_choose_existing_image">从我的原图选择</string>
+    <string name="create_input_image_preview">已选原图预览</string>
+    <string name="create_input_image_not_selected">未选择原图</string>
+    <string name="create_input_image_selected">已选择：%1$s</string>
+    <string name="create_input_image_empty_list">暂无已上传原图，请先上传</string>
+    <string name="create_input_image_uploading">正在上传原图...</string>
+    <string name="outpaint_crop_notice_title">输入图裁剪提醒</string>
+    <string name="outpaint_crop_notice_message">为保证生成效果，输入图会按中心区域裁剪为正方形，并缩放到 512x512 后用于 outpaint 推理。请尽量将主体放在画面中心。</string>
+    <string name="outpaint_crop_notice_confirm">我知道了，继续选图</string>
     <string name="create_btn_submit">提交任务</string>
     <string name="create_success">任务创建成功，ID: %1$d</string>
 
